@@ -1,49 +1,39 @@
-import React, { useState } from 'react';
-import LoginForm from './components/LoginForm'
+import React, {useEffect, useState} from 'react';
+import { BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import Home from "./pages/Home"
+import Login from "./pages/Login"
+import Nav from "./components/Nav"
+import NotFound from "./components/NotFound"
+import axios from "axios";
+import url from './config'
 
-function App() {
-  const adminUser = {
-    email: "hola@gmail.com",
-    password: "123"
-  }
+const App = () => {
+    const [name, setName] = useState('')
 
-  const [user, setUser] = useState({name:"",email:"",password:""});
-  const [error, setError] = useState("");
+    const instance = axios.create({
+        withCredentials: true,
+    })
 
-  const Login = details => {
-    console.log(details);
+    useEffect(()=>{
+        (
+            async () => {
+                await instance.get( `${url}/user`)
+                    .then(res => {
+                        setName(res.data.username)
+                    })
+            }
+        )();
+    })
 
-    if(details.email == adminUser.email && details.password == adminUser.password) {
-      console.log("Logged in");
-      setUser({
-        name: details.name,
-        email: details.email 
-      });
-
-    } else {
-      console.log("details do not match!");
-      setError("details do not match!");
-    }
-  } 
-  
-
-  const Logout = () => {
-    //console.log("Logout");
-    setUser({name:"",email:"",password:""});
-  }
-
-  return (
-    <div className="App">
-        {(user.email != "") ? (
-          <div className="welcome">
-             <h2>Welcome,<span>{user.name}</span></h2>
-             <button onClick={Logout}>Logout</button>
-          </div> 
-        ) : (
-          <LoginForm Login={Login} error={error}/>
-        )}
-    </div>
-  );
+    return (
+        <Router>
+            <Nav name={name} setName={setName}/>
+            <Switch>
+                <Route exact path="/" component={() => <Home name={name} />}/>
+                <Route exact path="/Login" component={() => <Login setName={setName}/>}/>
+                <Route component={NotFound}/>
+            </Switch>
+        </Router>
+    )
 }
-
-export default App;
+export default App
