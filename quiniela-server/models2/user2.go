@@ -6,3 +6,4 @@ type ADMIN struct {
 	Password string `json:"-"`
 	Email    string `json:"email"`
 }
+

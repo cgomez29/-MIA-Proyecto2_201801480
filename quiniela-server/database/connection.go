@@ -2,6 +2,8 @@ package database
 
 import (
 	"../models"
+	"database/sql"
+	"fmt"
 	"github.com/cengsin/oracle"
 	_ "github.com/godror/godror"
 	"gorm.io/gorm"
@@ -19,14 +21,20 @@ func Connect() {
 	DB = connection
 }
 
-/*
+var DB2 *sql.DB
+
+func Connect2() {
 	db, err := sql.Open("godror", "gomez/gomez@localhost:1521/ORCLCDB.localdomain")
 	if err != nil {
 		fmt.Println(err) //Could not connect to the database
 		return
 	}
-	defer db.Close()
-
+	DB2 = db
+	//defer db.Close()
 	fmt.Println("Connect to the database successful")
+}
 
-*/
+func ExecuteQuery(query string) (*sql.Rows, error) {
+	rows, err := DB2.Query(query)
+	return rows, err
+}

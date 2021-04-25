@@ -14,6 +14,10 @@ import (
 
 const SecretKey = "secret"
 
+func Welcome(c *fiber.Ctx) error {
+	return c.SendString("QUINIELA - API  👋!")
+}
+
 func Register(c *fiber.Ctx) error {
 	var data map[string]string
 	if err := c.BodyParser(&data); err != nil {

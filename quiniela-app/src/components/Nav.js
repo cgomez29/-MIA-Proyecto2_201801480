@@ -2,8 +2,30 @@ import React from 'react';
 import {Link} from "react-router-dom"
 import axios from "axios";
 import url from "../config";
+import {AppBar, Button, IconButton, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import HomeIcon from '@material-ui/icons/Home';
+import Avatar from '@material-ui/core/Avatar';
+
+const  useStyles = makeStyles(theme => ({
+    offset: theme.mixins.toolbar,
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    title:{
+        flexGrow: 1
+    },
+    root: {
+        display: 'flex',
+        '& > *': {
+            margin: theme.spacing(1),
+        },
+    },
+}))
+
 
 const Nav = (props: {name: string, setName: (name: string) => void }) => {
+    const classes = useStyles()
+
     const instance = axios.create({
         withCredentials: true,
     })
@@ -20,40 +42,39 @@ const Nav = (props: {name: string, setName: (name: string) => void }) => {
 
     if(props.name===''){
         menu = (
-            <ul className="nav navbar-nav">
-                <li className="active">
-                    <Link to="/">HOME</Link>
-                </li>
-                <li>
-                    <Link to="/login">Login</Link>
-                </li>
-                <li>
-                    <Link to="/login">Register</Link>
-                </li>
-            </ul>
+            <Button component={Link} to="/login" variant="text" color="inherit"  >
+                LogIn
+            </Button>
         )
     } else {
         menu = (
-            <ul className="nav navbar-nav">
-                <li className="active">
-                    <Link to="/">HOME</Link>
-                </li>
-                <li>
-                    <Link to="/login" onClick={logout}>Logout</Link>
-                </li>
-            </ul>
+            <React.Fragment>
+                <Button component={Link} to="/login" onClick={logout} variant="text" color="inherit"  >
+                    LogOut
+                </Button>
+                <div className={classes.root}>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                </div>
+            </React.Fragment>
         )
     }
 
 
     return (
-        <nav className="navbar navbar-default">
-            <div className="container-fluid">
-                <div className="navbar-header">
-                </div>
-                {menu}
-            </div>
-        </nav>
+        <React.Fragment>
+            <AppBar>
+                <Toolbar>
+                    <IconButton component={Link} to="/" color="inherit" aria-label="menu" className={classes.menuButton}>
+                        <HomeIcon/>
+                    </IconButton>
+                    <Typography variant='h6' className={classes.title}>
+                        QUINIELA
+                    </Typography>
+                    {menu}
+                </Toolbar>
+            </AppBar>
+            <div className={classes.offset}></div>
+        </React.Fragment>
     );
 };
 
