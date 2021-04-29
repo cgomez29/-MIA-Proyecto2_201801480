@@ -106,6 +106,59 @@ BEGIN
 END;
 
 
+CREATE OR REPLACE TRIGGER tr_auth 
+BEFORE INSERT OR UPDATE ON CLIENTE FOR EACH ROW
+
+DECLARE
+    v_username VARCHAR2(200);
+BEGIN
+    
+    SELECT username INTO v_username FROM CLIENTE WHERE username = :NEW.username FETCH FIRST 1 ROWS ONLY;
+
+    /* Checking email */
+    IF NOT REGEXP_LIKE (:NEW.email, '\s*\w+([-+.»]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\s*') THEN 
+        RAISE_APPLICATION_ERROR(-20111,'Invalid email Address, Please check it');
+    END IF;
+    /* Unique username */
+    IF  v_username = :NEW.username THEN
+        RAISE_APPLICATION_ERROR(-20111,'Username, Please check it');
+    END IF;
+    
+    /*
+        > 8 characters
+        at least one uppercase
+        at least one lowercase
+        at leaet one number        
+    */
+    
+    /*IF NOT REGEXP_LIKE(:NEW.password, '^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,}$') THEN
+        RAISE_APPLICATION_ERROR(-20111,'Password, Please check it');
+      --  RAISE_APPLICATION_ERROR(-20111,'Username already exists, Please check it');
+    END IF;*/
+    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN v_username:='';
+END;
+
+CREATE OR REPLACE TRIGGER tr_evento
+BEFORE INSERT OR UPDATE ON EVENTO FOR EACH ROW
+DECLARE
+BEGIN
+    IF :NEW.fecha_hora < sysdate THEN
+        RAISE_APPLICATION_ERROR(-20111,'TIMESTAMP, Please check it');
+    END IF;
+    
+END;
+
+
+ SELECT username FROM CLIENTE c WHERE c.username = 'cr' FETCH FIRST 1 ROWS ONLY;
+
+INSERT INTO CLIENTE(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo)
+VALUES('cris','Cris123..','56','874','gold', 'DATE()','DATE()', 'fied.fjid@gmail.com','rc');
+
+select * from CLIENTE;
+DELETE FROM CLIENTE WHERE idCliente = 4;
+
 commit;
 
 

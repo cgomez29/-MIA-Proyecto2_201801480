@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Home from "./pages/Home"
-import Login from "./pages/Login"
+import LoginPage from "./pages/Login"
 import Nav from "./components/Nav"
 import NotFound from "./components/NotFound"
 import axios from "axios";
 import url from './config'
+import SignIn from "./components/SignIn";
+import Temporada from "./pages/Admin/Temporada";
 
 const App = () => {
     const [name, setName] = useState('')
@@ -29,8 +31,10 @@ const App = () => {
         <Router>
             <Nav name={name} setName={setName}/>
             <Switch>
-                <Route exact path="/" component={() => <Home name={name} />}/>
-                <Route exact path="/Login" component={() => <Login setName={setName}/>}/>
+                <Route exact path="/" component={Home}/>
+                <Route exact path="/Login" component={() => <LoginPage setName={setName}/>}/>
+                <Route exact path="/register" component={SignIn}/>
+                <Route exact path="/temporada" component={Temporada}/>
                 <Route component={NotFound}/>
             </Switch>
         </Router>

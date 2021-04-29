@@ -1,24 +1,46 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import CardG from '../components/CardG'
+import axios from "axios";
+import url from "../config";
+import {Redirect} from "react-router-dom";
+import {Grid} from "@material-ui/core";
 
-const Home = (props: {name: string}) =>{
-    let menu
-    if(props.name) {
-        menu = (
-            <React.Fragment >
-                <CardG/>
-            </React.Fragment>
-        )
-    } else {
-        menu = (
-            <div>'You are not logged in'</div>
-        )
-    }
+const Home = () =>{
+    const [loggedIn, setLoggedIn] = useState(false)
+    const  [data, setData] = useState([])
 
+    const instance = axios.create({
+        withCredentials: true,
+    })
+
+    useEffect(()=>{
+        (
+            async () => {
+                await instance.get( `${url}/deporte`)
+                    .then(res => {
+                        setData(res.data)
+                    }).catch( err =>{
+                        setLoggedIn(true)
+                        })
+            }
+        )();
+
+    })
+
+    if (loggedIn)
+        return <Redirect to="/login"/>
 
     return (
-        <React.Fragment>
-            { menu }
+        <React.Fragment >
+            <Grid align="center">
+                {
+                    data.map((deporte) => (
+                        <CardG key={deporte.id}
+                               {...deporte}
+                        />
+                    ))
+                }
+            </Grid>
         </React.Fragment>
     );
 };

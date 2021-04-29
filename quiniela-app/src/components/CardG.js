@@ -90,7 +90,9 @@ const CardG = ({name, img, color}) => {
                         <div className={classes.paper}>
                             <EditIcon/>
                             <h2 id="transition-modal-title">Editar</h2>
-                            <p id="transition-modal-description">react-transition-group animates me.</p>
+                            <p id="transition-modal-description">
+                                { color }
+                            </p>
                         </div>
                     </Fade>
                 </Modal>

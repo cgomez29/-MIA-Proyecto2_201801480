@@ -42,13 +42,30 @@ const Nav = (props: {name: string, setName: (name: string) => void }) => {
 
     if(props.name===''){
         menu = (
-            <Button component={Link} to="/login" variant="text" color="inherit"  >
-                LogIn
-            </Button>
+            <React.Fragment>
+                <Button component={Link} to="/login" variant="text" color="inherit"  >
+                    LogIn
+                </Button>
+                <Button component={Link} to="/register" variant="text" color="inherit"  >
+                    SignIn
+                </Button>
+            </React.Fragment>
         )
     } else {
         menu = (
             <React.Fragment>
+                <Button component={Link} to="/login" variant="text" color="inherit"  >
+                    Bulk Load
+                </Button>
+                <Button component={Link} to="/login" variant="text" color="inherit"  >
+                    Jornada
+                </Button>
+                <Button component={Link} to="/temporada" variant="text" color="inherit"  >
+                    Temporada
+                </Button>
+                <Button component={Link} to="/login" variant="text" color="inherit"  >
+                    Recompensas
+                </Button>
                 <Button component={Link} to="/login" onClick={logout} variant="text" color="inherit"  >
                     LogOut
                 </Button>
@@ -58,7 +75,6 @@ const Nav = (props: {name: string, setName: (name: string) => void }) => {
             </React.Fragment>
         )
     }
-
 
     return (
         <React.Fragment>

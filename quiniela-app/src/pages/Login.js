@@ -2,8 +2,14 @@ import React, {SyntheticEvent ,useState} from 'react'
 import {Redirect} from 'react-router-dom'
 import url from '../config'
 import axios from 'axios'
+import {Avatar, Button, Grid, Link, Paper, TextField, Typography} from "@material-ui/core";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
-const Login = (props: {setName: (name: string) => void }) => {
+const LoginPage = (props: {setName: (name: string) => void }) => {
+    const paperStyle = {padding: 25, height:'50vh', width:300, margin: "20px auto"}
+    const avatarStyle = { backgroundColor:'green'}
+    const btnStyle = { margin:'8px 0' }
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [redirect, setRedirect] = useState(false)
@@ -33,21 +39,26 @@ const Login = (props: {setName: (name: string) => void }) => {
         return <Redirect to="/"/>
 
     return (
-        <form onSubmit={onSumbit} >
-            <div className="form-inner">
-                <h2>Login</h2>
-                <div className="form-group">
-                    <label htmlFor="email">Email:</label>
-                    <input type="text" name="email" onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password:</label>
-                    <input type="password" name="password" onChange={e => setPassword(e.target.value)}/>
-                </div>
-                <input type="submit" value="LOGIN"/>
-            </div>
-        </form>
+        <React.Fragment>
+            <form onSubmit={onSumbit}>
+                <Paper elevation={10} style={paperStyle}>
+                    <Grid align="center">
+                        <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
+                        <h2>Sign In</h2>
+                    </Grid>
+                    <TextField label='Email' placeholder="Enter email" fullWidth required onChange={e => setEmail(e.target.value)}/>
+                    <TextField label='Passwor' placeholder="Enter password" type="password" fullWidth required onChange={e => setPassword(e.target.value)}/>
+                    <Button type="submit"  color='primary' variant='contained' fullWidth style={btnStyle}>Sign in</Button>
+                    <Typography>
+                        <Link>
+                            Forgot password
+                        </Link>
+                    </Typography>
+                </Paper>
+            </form>
+        </React.Fragment>
+
     )
 }
 
-export default Login;
+export default LoginPage;
