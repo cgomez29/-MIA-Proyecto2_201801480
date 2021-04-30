@@ -11,7 +11,6 @@ func main() {
 	app := fiber.New()
 
 	database.Connect()
-	database.Connect2()
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,

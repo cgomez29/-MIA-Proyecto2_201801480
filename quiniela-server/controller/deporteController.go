@@ -50,8 +50,6 @@ func PostDeporte(c *fiber.Ctx) error {
 		return err
 	}
 	query := fmt.Sprintf("CALL sp_insert_deporte('%s','%s','%s')", data.Nombre, data.Imagen, data.Color)
-
-
 	_, err := database.ExecuteQuery(query)
 
 	if err != nil {

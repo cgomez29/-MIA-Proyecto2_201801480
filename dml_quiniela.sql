@@ -1,24 +1,133 @@
+INSERT INTO ROL(name) VALUES ('admin');
+INSERT INTO ROL(name) VALUES ('cliente');
+
+
+-- ADMIN
+INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
+VALUES ('cris','cris','Cristian','Gomez','GOLD',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
+TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',1);
+-- CLIENT
+INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
+VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
+TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',2);
+
+COMMIT;
+
+SELECT * FROM USUARIO;
+
+/*
+    INSERTS
+*/
+
+/* USUARIO */
+CREATE OR REPLACE PROCEDURE sp_insert_usuario ( 
+    v_username IN VARCHAR2,
+    v_password IN VARCHAR2,
+    v_name IN VARCHAR2,
+    v_surname IN VARCHAR2,
+    v_fecha_nacimiento IN VARCHAR2,
+    v_photo IN VARCHAR2,
+    v_email IN VARCHAR2
+    )
+AS
+BEGIN
+    INSERT INTO USUARIO(username, password, name, surname, tier,fecha_nacimiento, fecha_registro, email, photo, idRol)
+    VALUES (v_username, v_password, v_name, v_surname,'-',
+    (TO_TIMESTAMP(v_fecha_nacimiento, 'YYYY-MM-DD HH24:MI:SS.FF')),
+    SYSTIMESTAMP,v_email,v_photo,2);
+END;
+       
+CREATE OR REPLACE VIEW v_user AS
+SELECT 
+    idUsuario,username, name, surname, tier,fecha_nacimiento, email, photo 
+FROM 
+    USUARIO;
+    
+    
+SELECT * FROM v_user WHERE idUsuario = 2;
 
 /**
 *   Stored Procedured required
 **/
 
-
-CREATE OR REPLACE PROCEDURE sp_auth ( 
-    email IN VARCHAR2,
-    password IN VARCHAR2
+CREATE OR REPLACE PROCEDURE sp_auth2 ( 
+    v_username IN VARCHAR2,
+    v_password IN VARCHAR2
     )
 AS
-    auth SYS_REFCURSOR;
 BEGIN
-    IF auth IS NULL THEN
-        OPEN auth FOR
-        SELECT * FROM CLIENTE WHERE CLIENTE.email = email AND CLIENTE.password = password; 
-        DBMS_SQL.RETURN_RESULT(auth);
-        -- dbms_output.put_line(foo);
-    END IF;
-    
+    SELECT * FROM USUARIO WHERE username = v_username AND password = v_password;
+
 END;
+
+
+CREATE OR REPLACE PROCEDURE sp_auth ( 
+    v_username IN VARCHAR2,
+    v_password IN VARCHAR2
+    )
+AS
+    rowU NUMBER(1) := 0;
+BEGIN
+
+        SELECT COUNT(username) INTO rowU FROM USUARIO WHERE USUARIO.username =
+        v_username  AND USUARIO.password = v_password; 
+        ---DBMS_SQL.RETURN_RESULT(auth);
+        
+        dbms_output.put_line(rowU);
+        
+        IF rowU = 0 THEN
+            RAISE_APPLICATION_ERROR(-20111,'Username, Please check it');
+        END IF;
+END;
+
+
+EXEC sp_auth('cris','cris');
+
+create or replace procedure sp_login
+(
+    p_user_name IN VARCHAR2,
+    p_password  IN VARCHAR2,    
+    p_message in out varchar2
+)is
+
+v_user_count number(1):=0;
+
+begin
+
+   begin
+          select count(*) into v_user_count from USUARIO where username=p_user_name and password=p_password;        
+      exception
+            when others then
+              raise_application_error('-20001','Error While Retrieving Data.');
+   end;
+
+   if v_user_count=0 then
+         p_message:='Invalid Login Details';
+   elsif v_user_count=1 then
+         p_message:='Success';
+   else
+         p_message:='Critical Error.';
+   end if;
+
+end;
+
+
+CALL sp_login('cris', 'cris');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 CREATE OR REPLACE PROCEDURE sp_membership_payment (
     local IN NUMBER,    
@@ -168,8 +277,8 @@ select * from DEPORTE;
 
 EXECUT sp_delete_deporte(25);
 
-
-/*DROP TABLE PREDICCION;
+/*
+DROP TABLE PREDICCION;
 DROP TABLE DETALLE_EVENTO;
 DROP TABLE EQUIPO;
 DROP TABLE EVENTO;
@@ -177,9 +286,8 @@ DROP TABLE DETALLE_CLIENTE;
 DROP TABLE JORNADA;
 DROP TABLE RECOMPENSA;
 DROP TABLE MENSAJE;
-DROP TABLE CHAT;
 DROP TABLE ADMINS;
-DROP TABLE CLIENTE;
+DROP TABLE USUARIO;
 DROP TABLE TEMPORADA;
 DROP TABLE MEMBRESIA;
 DROP TABLE DEPORTE;

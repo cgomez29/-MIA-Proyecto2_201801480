@@ -1,11 +1,8 @@
 import React from 'react';
 import SeasonTable from "../../components/Admin/SeasonTable";
-import {Avatar, Grid} from "@material-ui/core";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import {Grid} from "@material-ui/core";
 
 const Temporada = () => {
-
-
 
     return (
         <Grid align="center">

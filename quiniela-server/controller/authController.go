@@ -3,7 +3,7 @@ package controller
 import (
 	"../database"
 	"../models"
-	"../models2"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"strconv"
@@ -19,47 +19,51 @@ func Welcome(c *fiber.Ctx) error {
 }
 
 func Register(c *fiber.Ctx) error {
-	var data map[string]string
+	var data models.USUARIO
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
 	//password, _:= bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-	user := models.ADMIN{
-		Username: data["username"],
-		Password: data["password"],
-		Email:	  data["email"],
-		//Password: password
+	query := fmt.Sprintf("CALL sp_insert_usuario('%s','%s','%s','%s','%s','%s','%s')",
+		data.Username, data.Password, data.Name, data.Surname, data.FechaNacimiento,
+		data.Photo, data.Email)
+	fmt.Println(query)
+
+
+	_, err := database.ExecuteQuery(query)
+
+	if err != nil {
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "Error running query",
+			"error": err,
+		})
 	}
-	database.DB.Create(&user)
-	return c.JSON(user)
+	return c.JSON(data)
 }
 
 func Login(c *fiber.Ctx) error  {
-	var data map[string]string
+	var data models.USUARIO
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
 
-	var user models2.ADMIN
+	query := fmt.Sprintf("CALL sp_auth('%s','%s')", data.Username, data.Password)
 
-	database.DB.Where("email=?",data["email"]).First(&user)
+	fmt.Println(query)
 
-	if user.Idadmin == 10 {
-		c.Status(fiber.StatusNotFound)
-		return c.JSON(fiber.Map{
-			"message": "User not found",
-		})
-	}
+	_, err := database.ExecuteQuery(query)
 
-	if user.Password != data["password"] {
+	if err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "Incorrect password",
+			"message": "Incorrect username or password",
 		})
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.Idadmin)),
+		Issuer: strconv.Itoa(int(data.IdRol)),
+		Id:     strconv.Itoa(int(data.IdUsuario)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
 	})
 
@@ -87,6 +91,8 @@ func Login(c *fiber.Ctx) error  {
 }
 
 func User(c *fiber.Ctx) error {
+	var user models.USUARIO
+
 	cookie := c.Cookies("jwt")
 	
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -102,9 +108,23 @@ func User(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	var user models2.ADMIN
+	query := fmt.Sprintf("SELECT * FROM v_user WHERE idUsuario = %s;", claims.Id)
 
-	database.DB.Where("idadmin = ?",claims.Issuer).First(&user)
+	rows,err := database.ExecuteQuery(query)
+
+	if err != nil  {
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "Error running query",
+			"error": err,
+		})
+	}
+
+	for rows.Next() {
+		rows.Scan(&user.IdUsuario, &user.Username, &user.Name, &user.Surname,
+					&user.FechaNacimiento, &user.Email, &user.Photo)
+	}
+	defer rows.Close()
 
 	return c.JSON(user)
 }

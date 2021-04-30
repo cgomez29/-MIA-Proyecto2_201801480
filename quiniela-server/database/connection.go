@@ -1,15 +1,12 @@
 package database
 
 import (
-	"../models"
 	"database/sql"
 	"fmt"
-	"github.com/cengsin/oracle"
 	_ "github.com/godror/godror"
-	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+/*var DB *gorm.DB
 
 func Connect() {
 
@@ -19,11 +16,11 @@ func Connect() {
 	}
 	connection.AutoMigrate(&models.ADMIN{})
 	DB = connection
-}
+}*/
 
 var DB2 *sql.DB
 
-func Connect2() {
+func Connect() {
 	db, err := sql.Open("godror", "gomez/gomez@localhost:1521/ORCLCDB.localdomain")
 	if err != nil {
 		fmt.Println(err) //Could not connect to the database
@@ -36,5 +33,6 @@ func Connect2() {
 
 func ExecuteQuery(query string) (*sql.Rows, error) {
 	rows, err := DB2.Query(query)
+	fmt.Println(err)
 	return rows, err
 }

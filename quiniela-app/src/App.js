@@ -8,6 +8,7 @@ import axios from "axios";
 import url from './config'
 import SignIn from "./components/SignIn";
 import Temporada from "./pages/Admin/Temporada";
+import HomeAdmin from './pages/Admin/Home'
 
 const App = () => {
     const [name, setName] = useState('')
@@ -34,7 +35,9 @@ const App = () => {
                 <Route exact path="/" component={Home}/>
                 <Route exact path="/Login" component={() => <LoginPage setName={setName}/>}/>
                 <Route exact path="/register" component={SignIn}/>
-                <Route exact path="/temporada" component={Temporada}/>
+                // admin
+                <Route exact path="/admin" component={HomeAdmin}/>
+                <Route exact path="/admin/temporada" component={Temporada}/>
                 <Route component={NotFound}/>
             </Switch>
         </Router>

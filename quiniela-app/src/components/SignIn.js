@@ -32,6 +32,6 @@ const SignIn = () => {
                 </Paper>
             </form>
         </React.Fragment>
-     );
+    );
 };
 export default SignIn;

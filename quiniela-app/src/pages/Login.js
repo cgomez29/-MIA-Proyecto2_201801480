@@ -36,7 +36,7 @@ const LoginPage = (props: {setName: (name: string) => void }) => {
 
 
     if(redirect)
-        return <Redirect to="/"/>
+        return <Redirect to="/admin"/>
 
     return (
         <React.Fragment>
