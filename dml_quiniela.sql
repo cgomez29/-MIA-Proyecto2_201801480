@@ -76,57 +76,14 @@ BEGIN
         dbms_output.put_line(rowU);
         
         IF rowU = 0 THEN
-            RAISE_APPLICATION_ERROR(-20111,'Username, Please check it');
+            RAISE_APPLICATION_ERROR(-20111,'Login, Please check it');
         END IF;
 END;
 
 
-EXEC sp_auth('cris','cris');
+EXEC sp_auth('crs','cris');
 
-create or replace procedure sp_login
-(
-    p_user_name IN VARCHAR2,
-    p_password  IN VARCHAR2,    
-    p_message in out varchar2
-)is
-
-v_user_count number(1):=0;
-
-begin
-
-   begin
-          select count(*) into v_user_count from USUARIO where username=p_user_name and password=p_password;        
-      exception
-            when others then
-              raise_application_error('-20001','Error While Retrieving Data.');
-   end;
-
-   if v_user_count=0 then
-         p_message:='Invalid Login Details';
-   elsif v_user_count=1 then
-         p_message:='Success';
-   else
-         p_message:='Critical Error.';
-   end if;
-
-end;
-
-
-CALL sp_login('cris', 'cris');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+select standard_hash('password', 'MD5') from USUARIO;
 
 
 CREATE OR REPLACE PROCEDURE sp_membership_payment (
@@ -215,19 +172,29 @@ BEGIN
 END;
 
 
+/**
+*   Triggers required
+**/
+
 CREATE OR REPLACE TRIGGER tr_auth 
-BEFORE INSERT OR UPDATE ON CLIENTE FOR EACH ROW
+BEFORE INSERT OR UPDATE ON USUARIO FOR EACH ROW
 
 DECLARE
     v_username VARCHAR2(200);
 BEGIN
     
-    SELECT username INTO v_username FROM CLIENTE WHERE username = :NEW.username FETCH FIRST 1 ROWS ONLY;
+    SELECT username INTO v_username FROM USUARIO WHERE username = :NEW.username FETCH FIRST 1 ROWS ONLY;
 
     /* Checking email */
     IF NOT REGEXP_LIKE (:NEW.email, '\s*\w+([-+.»]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\s*') THEN 
         RAISE_APPLICATION_ERROR(-20111,'Invalid email Address, Please check it');
     END IF;
+    
+    IF LENGTH(:NEW.password) < 8 THEN
+        RAISE_APPLICATION_ERROR(-20111,'Password 8, Please check it');
+      --  RAISE_APPLICATION_ERROR(-20111,'Username already exists, Please check it');
+    END IF;
+    
     /* Unique username */
     IF  v_username = :NEW.username THEN
         RAISE_APPLICATION_ERROR(-20111,'Username, Please check it');
@@ -240,6 +207,8 @@ BEGIN
         at leaet one number        
     */
     
+   
+    
     /*IF NOT REGEXP_LIKE(:NEW.password, '^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,}$') THEN
         RAISE_APPLICATION_ERROR(-20111,'Password, Please check it');
       --  RAISE_APPLICATION_ERROR(-20111,'Username already exists, Please check it');
@@ -248,6 +217,12 @@ BEGIN
 EXCEPTION
     WHEN NO_DATA_FOUND THEN v_username:='';
 END;
+
+-- CLIENT
+INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
+VALUES ('alexx2','alex416516541','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
+SYSTIMESTAMP,'crisgomez029@gmail.com','localhost',2);
+
 
 CREATE OR REPLACE TRIGGER tr_evento
 BEFORE INSERT OR UPDATE ON EVENTO FOR EACH ROW
@@ -260,13 +235,14 @@ BEGIN
 END;
 
 
- SELECT username FROM CLIENTE c WHERE c.username = 'cr' FETCH FIRST 1 ROWS ONLY;
 
-INSERT INTO CLIENTE(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo)
-VALUES('cris','Cris123..','56','874','gold', 'DATE()','DATE()', 'fied.fjid@gmail.com','rc');
 
-select * from CLIENTE;
+
+select LENGTH(password), password from USUARIO;
+
 DELETE FROM CLIENTE WHERE idCliente = 4;
+
+
 
 commit;
 

@@ -47,7 +47,7 @@ const LoginPage = (props: {setName: (name: string) => void }) => {
                         <h2>Sign In</h2>
                     </Grid>
                     <TextField label='Email' placeholder="Enter email" fullWidth required onChange={e => setEmail(e.target.value)}/>
-                    <TextField label='Passwor' placeholder="Enter password" type="password" fullWidth required onChange={e => setPassword(e.target.value)}/>
+                    <TextField label='Password' placeholder="Enter password" type="password" fullWidth required onChange={e => setPassword(e.target.value)}/>
                     <Button type="submit"  color='primary' variant='contained' fullWidth style={btnStyle}>Sign in</Button>
                     <Typography>
                         <Link>
