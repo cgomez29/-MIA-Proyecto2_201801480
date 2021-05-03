@@ -1,24 +1,28 @@
-import React, {SyntheticEvent ,useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {Redirect} from 'react-router-dom'
 import url from '../config'
 import axios from 'axios'
 import {Avatar, Button, Grid, Link, Paper, TextField, Typography} from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import {UserContext} from "../Context/UserContext";
 
-const LoginPage = (props: {setName: (name: string) => void }) => {
+const LoginPage = () => {
+    const {setRol, setSrc} = useContext(UserContext)
+
     const paperStyle = {padding: 25, height:'50vh', width:300, margin: "20px auto"}
     const avatarStyle = { backgroundColor:'green'}
     const btnStyle = { margin:'8px 0' }
 
-    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [redirect, setRedirect] = useState(false)
+    const [redirectUser, setRedirectUser] = useState(false)
+    const [redirectAdmin, setRedirectAdmin] = useState(false)
 
-    const onSumbit = async (e: SyntheticEvent) => {
+    const onSumbit = async (e) => {
         e.preventDefault()
 
         const auth = {
-            email: email,
+            username: username,
             password: password
         }
 
@@ -29,13 +33,21 @@ const LoginPage = (props: {setName: (name: string) => void }) => {
         await instance.post(`${url}/login`, auth)
             .then(res => {
                 //console.log(res)
-                setRedirect(true)
-                props.setName(res.data.username)
+                if(res.data.idRol === 2){
+                    setRedirectUser(true)
+                } else {
+                    setRedirectAdmin(true)
+                }
+
+                setRol(res.data.idRol)
+                setSrc(`${url}/img/${res.data.img}`)
             })
     }
 
+    if(redirectUser)
+        return <Redirect to="/user"/>
 
-    if(redirect)
+    if(redirectAdmin)
         return <Redirect to="/admin"/>
 
     return (
@@ -46,7 +58,7 @@ const LoginPage = (props: {setName: (name: string) => void }) => {
                         <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
                         <h2>Sign In</h2>
                     </Grid>
-                    <TextField label='Email' placeholder="Enter email" fullWidth required onChange={e => setEmail(e.target.value)}/>
+                    <TextField label='Username' placeholder="Enter username" fullWidth required onChange={e => setUsername(e.target.value)}/>
                     <TextField label='Password' placeholder="Enter password" type="password" fullWidth required onChange={e => setPassword(e.target.value)}/>
                     <Button type="submit"  color='primary' variant='contained' fullWidth style={btnStyle}>Sign in</Button>
                     <Typography>

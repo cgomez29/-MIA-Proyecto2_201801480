@@ -9,10 +9,10 @@ type USUARIO struct {
 	Name string `json:"name"`
 	Surname string `json:"surname"`
 	Tier string `json:"tier"`
-	FechaNacimiento string `json:"fecha"`
+	FechaNacimiento string `json:"date"`
 	Email string `json:"email"`
-	Photo string `json:"photo"`
-	IdRol uint `json:"img"`
+	Photo string `json:"img"`
+	IdRol uint `json:"idRol"`
 }
 
 /* END USUARIO */

@@ -18,41 +18,16 @@ func Welcome(c *fiber.Ctx) error {
 	return c.SendString("QUINIELA - API  👋!")
 }
 
-func Register(c *fiber.Ctx) error {
-	var data models.USUARIO
-	if err := c.BodyParser(&data); err != nil {
-		return err
-	}
-	//password, _:= bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-	query := fmt.Sprintf("CALL sp_insert_usuario('%s','%s','%s','%s','%s','%s','%s')",
-		data.Username, data.Password, data.Name, data.Surname, data.FechaNacimiento,
-		data.Photo, data.Email)
-	fmt.Println(query)
-
-
-	_, err := database.ExecuteQuery(query)
-
-	if err != nil {
-		c.Status(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"message": "Error running query",
-			"error": err,
-		})
-	}
-	return c.JSON(data)
-}
-
 func Login(c *fiber.Ctx) error  {
 	var data models.USUARIO
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
 
-	query := fmt.Sprintf("CALL sp_auth('%s','%s')", data.Username, data.Password)
+	//query := fmt.Sprintf("CALL sp_auth('%s','%s')", data.Username, data.Password)
+	query := fmt.Sprintf("SELECT idUsuario, idRol FROM USUARIO WHERE username = '%s' AND password = '%s'", data.Username, data.Password)
 
-	fmt.Println(query)
-
-	_, err := database.ExecuteQuery(query)
+	rows, err := database.ExecuteQuery(query)
 
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
@@ -61,9 +36,17 @@ func Login(c *fiber.Ctx) error  {
 		})
 	}
 
+	for rows.Next() {
+		fmt.Println(rows)
+		rows.Scan(&data.IdUsuario, &data.IdRol)
+	}
+	defer rows.Close()
+
+	//fmt.Println("result: " ,data)
+
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer: strconv.Itoa(int(data.IdRol)),
-		Id:     strconv.Itoa(int(data.IdUsuario)),
+		Issuer: strconv.Itoa(int(data.IdUsuario)),
+		Id: strconv.Itoa(int(data.IdRol)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
 	})
 
@@ -87,6 +70,7 @@ func Login(c *fiber.Ctx) error  {
 
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"idRol": data.IdRol,
 	})
 }
 
@@ -108,7 +92,7 @@ func User(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	query := fmt.Sprintf("SELECT * FROM v_user WHERE idUsuario = %s;", claims.Id)
+	query := fmt.Sprintf("SELECT * FROM v_user WHERE idUsuario = %s", claims.Issuer)
 
 	rows,err := database.ExecuteQuery(query)
 
@@ -121,11 +105,11 @@ func User(c *fiber.Ctx) error {
 	}
 
 	for rows.Next() {
-		rows.Scan(&user.IdUsuario, &user.Username, &user.Name, &user.Surname,
-					&user.FechaNacimiento, &user.Email, &user.Photo)
+		rows.Scan(&user.IdUsuario, &user.Username, &user.Name, &user.Surname, &user.Tier,
+					&user.FechaNacimiento, &user.Email, &user.Photo, &user.IdRol)
 	}
 	defer rows.Close()
-
+	fmt.Println(user)
 	return c.JSON(user)
 }
 
@@ -144,12 +128,17 @@ func Logout(c *fiber.Ctx) error {
 	})
 }
 
-func Upload(c *fiber.Ctx) error {
+func Register(c *fiber.Ctx) error {
+	// register
+	var data models.USUARIO
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
 
-	fmt.Println("SIIIIIIIIIII")
+	// save photo
+	var nameImg string
 
-	form, err := c.MultipartForm()
-	if err == nil {
+	if form, err := c.MultipartForm(); err == nil {
 		// Get all files from "documents" key:
 		files := form.File["file"]
 		// => []*multipart.FileHeader
@@ -159,17 +148,37 @@ func Upload(c *fiber.Ctx) error {
 			fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
 			// => "tutorial.pdf" 360641 "application/pdf"
 
+			path := fmt.Sprintf("./files/%s_%s", data.Username, file.Filename)
+			nameImg = fmt.Sprintf("%s_%s", data.Username, file.Filename)
 			// Save the files to disk:
-			if err := c.SaveFile(file, fmt.Sprintf("./files/%s", file.Filename)); err != nil {
+			if err := c.SaveFile(file,path); err != nil {
 				fmt.Println(err)
 				return err
 			}
 		}
 	}
 
-	return err
+	// register
+	//password, _:= bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	query := fmt.Sprintf("CALL sp_insert_usuario('%s','%s','%s','%s','%s','%s','%s')",
+		data.Username, data.Password, data.Name, data.Surname, data.FechaNacimiento,
+		nameImg, data.Email)
+	fmt.Println("REGISTER: ",query)
+
+	_, err := database.ExecuteQuery(query)
+
+	if err != nil {
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "Error running query",
+			"error": err,
+		})
+	}
+	return c.JSON(data)
 }
 
 func ViewImg(c *fiber.Ctx) error {
-	return c.SendFile("./files/archi.png")
+	var name string = c.Params("id")
+	img := fmt.Sprintf("./files/%s", name)
+	return c.SendFile(img)
 }

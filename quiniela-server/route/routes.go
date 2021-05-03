@@ -12,8 +12,7 @@ func Setup(app *fiber.App) {
 	app.Post("/api/login", controller.Login)
 	app.Get("/api/user", controller.User)
 	app.Post("/api/logout", controller.Logout)
-	app.Post("/api/upload", controller.Upload)
-	app.Get("/api/img", controller.ViewImg)
+	app.Get("/api/img/:id", controller.ViewImg)
 
 	// DEPORTES
 	app.Get("/api/deporte", controller.GetDeportes)

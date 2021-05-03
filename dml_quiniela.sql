@@ -39,10 +39,9 @@ END;
        
 CREATE OR REPLACE VIEW v_user AS
 SELECT 
-    idUsuario,username, name, surname, tier,fecha_nacimiento, email, photo 
+    idUsuario,username, name, surname, tier,fecha_nacimiento, email, photo, idRol
 FROM 
     USUARIO;
-    
     
 SELECT * FROM v_user WHERE idUsuario = 2;
 
@@ -71,17 +70,20 @@ BEGIN
 
         SELECT COUNT(username) INTO rowU FROM USUARIO WHERE USUARIO.username =
         v_username  AND USUARIO.password = v_password; 
-        ---DBMS_SQL.RETURN_RESULT(auth);
         
-        dbms_output.put_line(rowU);
         
         IF rowU = 0 THEN
             RAISE_APPLICATION_ERROR(-20111,'Login, Please check it');
         END IF;
+        
+        DBMS_OUTPUT.PUT_LINE('idUsuario' || (rowU));
+        
 END;
 
+EXEC sp_auth('cris','cris');
 
-EXEC sp_auth('crs','cris');
+
+SELECT * from USUARIO;
 
 select standard_hash('password', 'MD5') from USUARIO;
 
@@ -241,7 +243,7 @@ END;
 select LENGTH(password), password from USUARIO;
 
 DELETE FROM CLIENTE WHERE idCliente = 4;
-
+SELECT * from usuario;
 
 
 commit;
