@@ -6,12 +6,21 @@ import {AppBar, Button, IconButton, Toolbar, Typography} from "@material-ui/core
 import HomeIcon from '@material-ui/icons/Home';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import {UserContext} from "../Context/UserContext";
 import Badge from '@material-ui/core/Badge';
 import Avatar from '@material-ui/core/Avatar';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
-
+import clsx from 'clsx';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import SportsFootballIcon from '@material-ui/icons/SportsFootball';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import BackupIcon from '@material-ui/icons/Backup';
 
 const StyledBadge = withStyles((theme) => ({
     badge: {
@@ -56,6 +65,12 @@ const  useStyles = makeStyles(theme => ({
             margin: theme.spacing(0),
         },
     },
+    list: {
+        width: 250,
+    },
+    fullList: {
+        width: 'auto',
+    },
 }))
 
 const Nav = () => {
@@ -65,6 +80,72 @@ const Nav = () => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
 
+    /* FOR DRAWER*/
+    const [state, setState] = React.useState({
+        top: false,
+        left: false,
+        bottom: false,
+        right: false,
+    });
+
+    const toggleDrawer = (anchor, open) => (event) => {
+        if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+
+        setState({ ...state, [anchor]: open });
+    };
+    let menuList;
+
+    if(rol===1) {
+        menuList = (
+            <React.Fragment>
+                <List>
+                    <ListItem component={Link} to="/admin">
+                        <ListItemIcon> <HomeIcon /> </ListItemIcon>
+                        <ListItemText> HOME </ListItemText>
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    <ListItem component={Link} to="/admin/bulkload">
+                        <ListItemIcon> <BackupIcon /> </ListItemIcon>
+                        <ListItemText> Carga Masiva  </ListItemText>
+                    </ListItem>
+                    <ListItem  component={Link} to="/admin/temporada" >
+                        <ListItemIcon> <CalendarTodayIcon /> </ListItemIcon>
+                        <ListItemText> TEMPORADA </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/admin/jornada">
+                        <ListItemIcon> <DateRangeIcon /> </ListItemIcon>
+                        <ListItemText> JORNADA </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/admin/deporte">
+                        <ListItemIcon> <SportsFootballIcon /> </ListItemIcon>
+                        <ListItemText> DEPORTES </ListItemText>
+                    </ListItem>
+                </List>
+            </React.Fragment>
+        )
+    }
+
+    const list = (anchor) => (
+
+
+        <div
+            className={clsx(classes.list, {
+                [classes.fullList]: anchor === 'top' || anchor === 'bottom',
+            })}
+            role="presentation"
+            onClick={toggleDrawer(anchor, false)}
+            onKeyDown={toggleDrawer(anchor, false)}
+        >
+            {menuList}
+        </div>
+    );
+
+
+    /* FOR MODAL*/
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -72,6 +153,7 @@ const Nav = () => {
         setAnchorEl(event.currentTarget);
     };
 
+    /* FOR AXIOS */
     const instance = axios.create({
         withCredentials: true,
     })
@@ -93,7 +175,7 @@ const Nav = () => {
 
         menu = (
             <React.Fragment>
-                <IconButton component={Link} to="/user" color="inherit" aria-label="menu" className={classes.menuButton}>
+                <IconButton onClick={toggleDrawer('left', true)} color="inherit" aria-label="menu" className={classes.menuButton}>
                     <HomeIcon/>
                 </IconButton>
                 <Typography variant='h5' className={classes.title}>
@@ -149,19 +231,12 @@ const Nav = () => {
     } else if(rol===1) {
         menu = (
             <React.Fragment>
-                <IconButton component={Link} to="/admin" color="inherit" aria-label="menu" className={classes.menuButton}>
+                <IconButton onClick={toggleDrawer('left', true)} color="inherit" aria-label="menu" className={classes.menuButton}>
                     <HomeIcon/>
                 </IconButton>
                 <Typography variant='h6' className={classes.title}>
                     QUINIELA
                 </Typography>
-                <Button component={Link} to="/admin/temporada" variant="text" color="inherit"  >
-                    Temporada
-                </Button>
-
-                <Button component={Link} to="/admin/deporte" variant="text" color="inherit"  >
-                    Deportes
-                </Button>
                 <div>
                     <IconButton
                         aria-label="account of current user"
@@ -238,6 +313,20 @@ const Nav = () => {
             </AppBar>
             <div className={classes.offset}>
             </div>
+
+            <div>
+                    <React.Fragment >
+                        <SwipeableDrawer
+                            anchor={'left'}
+                            open={state['left']}
+                            onClose={toggleDrawer('left', false)}
+                            onOpen={toggleDrawer('left', true)}
+                        >
+                            {list('left')}
+                        </SwipeableDrawer>
+                    </React.Fragment>
+            </div>
+
         </React.Fragment>
     );
 };

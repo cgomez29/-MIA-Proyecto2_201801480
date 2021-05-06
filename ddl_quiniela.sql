@@ -40,7 +40,7 @@ CREATE TABLE USUARIO (
     password VARCHAR2(255) NOT NULL,
     name VARCHAR(150) NOT NULL,
     surname VARCHAR(150) NOT NULL,
-    tier VARCHAR(100) NOT NULL,
+    tier VARCHAR(100) NULL,
     fecha_nacimiento TIMESTAMP NULL,
     fecha_registro TIMESTAMP NOT NULL,
     email VARCHAR2(255) NULL,

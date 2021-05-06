@@ -19,4 +19,8 @@ func Setup(app *fiber.App) {
 	app.Post("/api/deporte", controller.PostDeporte)
 	app.Put("/api/deporte/:id", controller.PutDeporte)
 	app.Delete("/api/deporte/:id", controller.DeleteDeporte)
+
+	//CARGAR ARCHIVO
+	app.Post("/api/bulkload",controller.BulkLoad)
+
 }

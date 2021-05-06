@@ -9,8 +9,10 @@ import url from './config'
 import SignIn from "./components/SignIn";
 import Temporada from "./pages/Admin/Temporada";
 import Deporte from "./pages/Admin/Deporte";
+import Jornada from "./pages/Admin/Jornada";
 import HomeAdmin from './pages/Admin/Home'
 import {UserContext} from "./Context/UserContext";
+import Bulkload from "./pages/Admin/Bulkload";
 
 const App = () => {
     const [rol, setRol] = useState('')
@@ -43,6 +45,8 @@ const App = () => {
                     <Route exact path="/admin" component={HomeAdmin}/>
                     <Route exact path="/admin/temporada" component={Temporada}/>
                     <Route exact path="/admin/deporte" component={Deporte}/>
+                    <Route exact path="/admin/jornada" component={Jornada}/>
+                    <Route exact path="/admin/bulkload" component={Bulkload}/>
 
                     <Route component={NotFound}/>
 
