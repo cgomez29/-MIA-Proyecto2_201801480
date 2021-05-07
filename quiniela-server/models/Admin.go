@@ -43,3 +43,13 @@ type Temporal struct {
 	Username    string `json:"username"`
 	Resultados ArrayResultados `json:"resultados"`
 }
+
+/* TEMPORADA */
+
+type  Temporada struct {
+	IdTemporada uint `json:"idTemporada"`
+	Nombre string `json:"nombre"`
+	FechaInicio string `json:"fechainicio"`
+	FechaFin string `json:"fechafin"`
+	Estado uint `json:"estado"`
+}

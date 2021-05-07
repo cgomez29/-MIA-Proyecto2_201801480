@@ -1,7 +1,7 @@
+-- ROL
 INSERT INTO ROL(name) VALUES ('admin');
 INSERT INTO ROL(name) VALUES ('cliente');
-
-
+ 
 -- ADMIN
 INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
 VALUES ('cris','cris','Cristian','Gomez','GOLD',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
@@ -11,9 +11,19 @@ INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, f
 VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
 TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',2);
 
+-- Tier 
+INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Gold', 900); 
+INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Silver', 450); 
+INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Bronze', 150); 
+
+-- FASE 
+INSERT INTO FASE(nombre) VALUES ('Activa'); 
+INSERT INTO FASE(nombre) VALUES ('Calculo'); 
+INSERT INTO FASE(nombre) VALUES ('Finalizada'); 
+
 COMMIT;
 
-SELECT * FROM USUARIO;
+SELECT * FROM MEMBRESIA;
 
 /*
     INSERTS
@@ -255,19 +265,18 @@ select * from DEPORTE;
 
 EXECUT sp_delete_deporte(25);
 
-/*
+
 DROP TABLE PREDICCION;
 DROP TABLE DETALLE_EVENTO;
 DROP TABLE EQUIPO;
 DROP TABLE EVENTO;
-DROP TABLE DETALLE_CLIENTE;
+DROP TABLE DETALLE_USUARIO;
 DROP TABLE JORNADA;
 DROP TABLE RECOMPENSA;
 DROP TABLE MENSAJE;
-DROP TABLE ADMINS;
+-- DROP TABLE ADMINS;
 DROP TABLE USUARIO;
 DROP TABLE TEMPORADA;
 DROP TABLE MEMBRESIA;
 DROP TABLE DEPORTE;
-DROP TABLE FASE;
-*/
+DROP TABLE FASE; 
