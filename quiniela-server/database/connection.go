@@ -27,12 +27,19 @@ func Connect() {
 		return
 	}
 	DB2 = db
-	//defer db.Close()
 	fmt.Println("Connect to the database successful")
+	//defer db.Close()
 }
 
 func ExecuteQuery(query string) (*sql.Rows, error) {
 	rows, err := DB2.Query(query)
+	//defer rows.Close()
 	fmt.Println(err)
 	return rows, err
+}
+
+func Execute(query string)  error {
+	_,err := DB2.Exec(query)
+	fmt.Println("EXECUTE: ", err)
+	return err
 }

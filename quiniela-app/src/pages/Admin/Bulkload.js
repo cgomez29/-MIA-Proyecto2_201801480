@@ -17,8 +17,8 @@ export default class Bulkload extends React.Component {
         reader.onload = e => {
             try {
                 const doc = yaml.load(e.target.result);
-                //this.load = JSON.stringify(doc);
-                this.load = doc
+                this.load = JSON.stringify(doc);
+                //this.load = doc
                 //console.log(this.load);
                 //console.log(doc['A2'])
                 this.onSubmit();
@@ -30,9 +30,9 @@ export default class Bulkload extends React.Component {
         this.setState({ title: file.name });
     };
     onSubmit = async () => {
-        console.log(JSON.stringify(this.load['A2']))
 
-        /*await axios.post(`${url}/bulkload`, JSON.stringify(this.load['A2']))
+        console.log(this.load)
+        /*await axios.post(`${url}/bulkload`, this.load)
             .then(res => {
                 console.log(res)
             }).catch(err =>{

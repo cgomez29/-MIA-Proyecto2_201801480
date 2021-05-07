@@ -44,6 +44,8 @@ type Temporal struct {
 	Resultados ArrayResultados `json:"resultados"`
 }
 
+type ArrayTemporal  map[string]Temporal
+
 /* TEMPORADA */
 
 type  Temporada struct {
