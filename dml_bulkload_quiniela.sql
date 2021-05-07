@@ -25,7 +25,6 @@ BEGIN
     COMMIT;
 END;
 
-
 /*TEMPORADA*/
 CREATE OR REPLACE PROCEDURE sp_insert_temporada_bl ( 
     v_name IN VARCHAR2,
@@ -89,6 +88,50 @@ BEGIN
     -- COMMIT;
 END;
 
+/*EVENTO*/
+CREATE OR REPLACE PROCEDURE sp_insert_evento_bl ( 
+    v_fechahora IN VARCHAR2,
+    v_local IN VARCHAR2,
+    v_visitante IN VARCHAR2,
+    v_idJornada IN NUMBER,
+    v_idDeporte IN NUMBER
+    )
+AS
+BEGIN
+    INSERT INTO EVENTO(fecha_hora, estado, local, visitante, idJornada, idDeporte)
+    VALUES (TO_TIMESTAMP(v_fechahora, 'YYYY-MM-DD HH24:MI:SS.FF'), 0, v_local, v_visitante,
+            v_idJornada, v_idDeporte);
+    COMMIT;
+END;
+
+/*RESULTADO*/
+CREATE OR REPLACE PROCEDURE sp_insert_resultado_bl ( 
+    v_visitante IN NUMBER,
+    v_local IN NUMBER,
+    v_idEvento IN NUMBER
+    )
+AS
+BEGIN
+    INSERT INTO RESULTADO(visitante, local, idEvento) 
+    VALUES (v_visitante, v_local, v_idEvento);
+    COMMIT;
+END;
+
+/*PREDICCION*/
+CREATE OR REPLACE PROCEDURE sp_insert_prediccion_bl ( 
+    v_local IN NUMBER,
+    v_visitante IN NUMBER,
+    v_idEvento IN NUMBER,
+    v_idUsuario IN NUMBER
+    )
+AS
+BEGIN
+    INSERT INTO PREDICCION(local, visitante, idEvento, idUsuario) 
+    VALUES (v_local, v_visitante,v_idEvento, v_idUsuario);
+    COMMIT;
+END;
+
+
 /*EXEC sp_insert_jornada_bl ('J1', '2018/3/1', 1, 1);
 EXEC sp_insert_jornada_bl ('J2', '2018/3/1', 2, 1);
 EXEC sp_insert_jornada_bl ('J3', '2018/3/1', 3, 1);
@@ -101,11 +144,22 @@ SELECT * FROM TEMPORADA;
 SELECT * FROM DETALLE_USUARIO;
 SELECT * FROM JORNADA;
 SELECT * FROM DEPORTE;
+SELECT * FROM EVENTO;
+SELECT * FROM RESULTADO;
+SELECT * FROM PREDICCION;
 
-SELECT idUsuario FROM USUARIO WHERE username = 'jpook0@army.mil';
 
-EXEC sp_insert_detalle_usuario_bl(1,1,1);
-SELECT idTemporada FROM TEMPORADA WHERE nombre = '2020-Q4';
+EXEC sp_insert_evento_bl('5/5/5','efe','ef',1,1);
+
+
+SELECT idDeporte FROM DEPORTE WHERE nombre = 'ping-pong';
+
+SELECT idDeporte FROM DEPORTE WHERE nombre = 'ping-pong';
+
+SELECT * FROM JORNADA WHERE name = 'J3' AND idTemporada = 1;
+
+SELECT idEvento FROM EVENTO WHERE idJornada = 1 AND idDeporte = 1 AND fecha_hora = TO_TIMESTAMP('5/5/5', 'YYYY-MM-DD HH24:MI:SS.FF');
+
 
 
 COMMIT;

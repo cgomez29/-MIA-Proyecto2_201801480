@@ -53,3 +53,42 @@ type  Temporada struct {
 	FechaFin string `json:"fechafin"`
 	Estado uint `json:"estado"`
 }
+
+/* JORNADA */
+type  Jornada struct {
+	IdJornada int `json:"idJornada"`
+	Nombre string `json:"name"`
+	FechaInicio string `json:"fechainicio"`
+	FechaFin string `json:"fechafin"`
+	IdFase int `json:"idFase"`
+	IdTemporada uint `json:"idTemporada"`
+}
+
+/* EVENTO */
+
+type EVENTO struct {
+	IdEvento int `json:"idEvento"`
+	FechaHora string `json:"fechahora"`
+	Estado int `json:"estado"`
+	Local string `json:"local"`
+	Visitante string `json:"visitante"`
+	IdJornada int `json:"idJornada"`
+	IdDeporte int `json:"idDeporte"`
+}
+
+/* PREDICCIONES */
+type PREDICCION struct {
+	IdPrediccion int `json:"idPrediccion"`
+	Local int `json:"local"`
+	Visitante int `json:"visitante"`
+	IdEvento int `json:"idEvento"`
+	IdUsuario int `json:"idUsuario"`
+}
+
+/* RESULTADOS */
+type RESULTADO struct {
+	IdResultado int `json:"idResultado"`
+	Local int `json:"local"`
+	Visitante int `json:"visitante"`
+	IdEvento int `json:"idEvento"`
+}

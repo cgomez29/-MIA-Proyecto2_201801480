@@ -12,6 +12,9 @@ func BulkLoad(c *fiber.Ctx) error  {
 	var data models.Temporal
 	var user models.USUARIO
 	var temporada models.Temporada
+	var jornada models.Jornada
+	var deporte models.DEPORTE
+	var evento models.EVENTO
 
 	if err:= c.BodyParser(&data); err != nil {
 		return err
@@ -70,8 +73,8 @@ func BulkLoad(c *fiber.Ctx) error  {
 		for rows.Next() {
 			rows.Scan(&temporada.IdTemporada)
 		}
-		var idMembresia int
 
+		var idMembresia int
 		if i.Tier == "gold" {
 			idMembresia = 1
 		} else if i.Tier == "silver" {
@@ -91,12 +94,80 @@ func BulkLoad(c *fiber.Ctx) error  {
 				j.Jornada, dateTemporada, semana, strconv.Itoa(int(temporada.IdTemporada)))
 			database.ExecuteQuery(query)
 
+			//Obteniendo id Jornada actual
+			query = fmt.Sprintf("SELECT idJornada FROM JORNADA WHERE name = '%s' AND idTemporada = %s",
+				j.Jornada, strconv.Itoa(int(temporada.IdTemporada)))
+
+			rows,err := database.ExecuteQuery(query)
+			if err != nil  {
+				c.Status(fiber.StatusInternalServerError)
+				return c.JSON(fiber.Map{
+					"message": "Error running query",
+					"error": err,
+				})
+			}
+
+			for rows.Next() {
+				rows.Scan(&jornada.IdJornada)
+			}
+
 			for _, k:= range j.Predicciones {
 				// INSERTANDO DEPORTES
 				query = fmt.Sprintf("CALL sp_insert_deporte_bl('%s')", k.Deporte)
 				database.ExecuteQuery(query)
-			}
 
+				//Obteniendo id Deporte
+				query = fmt.Sprintf("SELECT idDeporte FROM DEPORTE WHERE nombre = '%s'",
+						k.Deporte)
+
+				rows,err = database.ExecuteQuery(query)
+				if err != nil  {
+					c.Status(fiber.StatusInternalServerError)
+					return c.JSON(fiber.Map{
+						"message": "Error running query",
+						"error": err,
+					})
+				}
+
+				for rows.Next() {
+					rows.Scan(&deporte.IdDeporte)
+				}
+
+				//CREANDO EVENTOS
+				query = fmt.Sprintf("CALL sp_insert_evento_bl('%s','%s','%s',%s,%s)",
+						k.Fecha, k.Local, k.Visitante, strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)))
+				database.ExecuteQuery(query)
+
+				//OBTENIENDO id de EVENTO
+				query = fmt.Sprintf("SELECT idEvento FROM EVENTO WHERE idJornada = %s AND idDeporte = %s AND fecha_hora = TO_TIMESTAMP('%s', 'YYYY-MM-DD HH24:MI:SS.FF')",
+					strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)), k.Fecha)
+
+				rows,err = database.ExecuteQuery(query)
+				if err != nil  {
+					c.Status(fiber.StatusInternalServerError)
+					return c.JSON(fiber.Map{
+						"message": "Error running query",
+						"error": err,
+					})
+				}
+
+				for rows.Next() {
+					rows.Scan(&evento.IdEvento)
+				}
+
+				//CREANDO RESULTADOS
+				query = fmt.Sprintf("CALL sp_insert_resultado_bl(%s,%s,%s)",
+					strconv.Itoa(int(k.Resultado.Visitante)), strconv.Itoa(int(k.Resultado.Local)),
+						strconv.Itoa(evento.IdEvento))
+				database.ExecuteQuery(query)
+
+				//CREANDO PREDICCIONES
+				query = fmt.Sprintf("CALL sp_insert_prediccion_bl(%s,%s,%s,%s)",
+					strconv.Itoa(int(k.Prediccion.Local)), strconv.Itoa(int(k.Prediccion.Visitante)),
+					strconv.Itoa(evento.IdEvento), strconv.Itoa(int(user.IdUsuario)))
+				database.ExecuteQuery(query)
+
+			}
 		}
 	}
 
