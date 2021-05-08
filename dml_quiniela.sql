@@ -12,9 +12,9 @@ VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.
 TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',2);
 
 -- Tier 
-INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Gold', 900); 
-INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Silver', 450); 
 INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Bronze', 150); 
+INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Silver', 450); 
+INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Gold', 900); 
 
 -- FASE 
 INSERT INTO FASE(nombre) VALUES ('Activa'); 

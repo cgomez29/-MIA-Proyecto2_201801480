@@ -51,6 +51,24 @@ BEGIN
     COMMIT;
 END;
 
+CREATE OR REPLACE PROCEDURE sp_update_detalleu_score_bl ( 
+    v_score IN NUMBER,
+    v_p10 IN NUMBER,
+    v_p5 IN NUMBER,
+    v_p3 IN NUMBER,
+    v_p0 IN NUMBER,
+    v_idTemporada IN NUMBER,
+    v_idUsuario IN NUMBER
+    )
+AS
+BEGIN
+    UPDATE DETALLE_USUARIO SET score = (score + v_score), p_10 = (p_10 + v_p10),
+         p_5 = (p_5 + v_p5), p_3 = (p_3 + v_p3), p_0 = (p_0 + v_p0)
+    WHERE idUsuario = v_idUsuario AND idTemporada = v_idTemporada;
+    COMMIT;
+END;
+
+
 /*JORNADA */
 CREATE OR REPLACE PROCEDURE sp_insert_jornada_bl ( 
     v_name IN VARCHAR2,
@@ -132,6 +150,23 @@ BEGIN
 END;
 
 
+/* RECOMPENSA */
+
+CREATE OR REPLACE PROCEDURE sp_insert_recompensa_bl ( 
+    v_score IN NUMBER,
+    v_premio IN FLOAT,
+    v_tier IN VARCHAR2,
+    v_idUsuario IN NUMBER,
+    v_idTemporada IN NUMBER
+    )
+AS
+BEGIN
+    INSERT INTO RECOMPENSA(score, premio, tier, ultimo, fecha, incremento, idUsuario, idTemporada) 
+    VALUES (v_score, v_premio, v_tier, 0, SYSDATE,0, v_idUsuario, v_idTemporada);
+    COMMIT;
+END;
+
+
 /*EXEC sp_insert_jornada_bl ('J1', '2018/3/1', 1, 1);
 EXEC sp_insert_jornada_bl ('J2', '2018/3/1', 2, 1);
 EXEC sp_insert_jornada_bl ('J3', '2018/3/1', 3, 1);
@@ -141,25 +176,28 @@ EXEC sp_insert_jornada_bl ('J4', '2018/3/1', 4, 1);*/
 
 SELECT * FROM USUARIO;
 SELECT * FROM TEMPORADA;
-SELECT * FROM DETALLE_USUARIO;
+SELECT * FROM DETALLE_USUARIO WHERE idTemporada = 3;
 SELECT * FROM JORNADA;
 SELECT * FROM DEPORTE;
 SELECT * FROM EVENTO;
 SELECT * FROM RESULTADO;
 SELECT * FROM PREDICCION;
+SELECT * FROM MEMBRESIA;
+SELECT * FROM RECOMPENSA WHERE idTemporada = 1;
+SELECT * FROM RECOMPENSA;
 
 
 EXEC sp_insert_evento_bl('5/5/5','efe','ef',1,1);
 
 
-SELECT idDeporte FROM DEPORTE WHERE nombre = 'ping-pong';
 
-SELECT idDeporte FROM DEPORTE WHERE nombre = 'ping-pong';
+SELECT score, idUsuario, idMembresia FROM DETALLE_USUARIO 
+WHERE idTemporada = 1
+ORDER BY score DESC FETCH FIRST 3 ROWS ONLY;
 
-SELECT * FROM JORNADA WHERE name = 'J3' AND idTemporada = 1;
+SELECT * FROM DETALLE_USUARIO ;
 
-SELECT idEvento FROM EVENTO WHERE idJornada = 1 AND idDeporte = 1 AND fecha_hora = TO_TIMESTAMP('5/5/5', 'YYYY-MM-DD HH24:MI:SS.FF');
-
+SELECT COUNT(idMembresia), idMembresia FROM DETALLE_USUARIO WHERE idTemporada = 1 GROUP BY idMembresia;
 
 
 COMMIT;

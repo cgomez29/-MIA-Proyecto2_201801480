@@ -94,3 +94,40 @@ type RESULTADO struct {
 	Visitante int `json:"visitante"`
 	IdEvento int `json:"idEvento"`
 }
+
+/* RewardBulkLoad */
+type RewardBulkLoad struct {
+	Score int `json:"score"`
+	IdUsuario int `json:"idUsuario"`
+	IdMembresia int `json:"idMembresia"`
+}
+/* TOTAL TEMPORADA*/
+type TotalTemporada struct {
+	Cantidad int `json:"cantidad"`
+	IdMembresia int `json:"idMembresia"`
+}
+
+// RECOMPENSA
+type REWARD struct {
+	IdRecompensa int `json:"idRecompensa"`
+	Score int `json:"score"`
+	Premio float64 `json:"premio"`
+	Tier string `json:"tier"`
+	Ultimo float64 `json:"ultimo"`
+	fecha string `json:"fecha"`
+	Incremento int `json:"incremento"`
+	IdUsuario int `json:"idUsuario"`
+	IdTemporada int `json:"idTemporada"`
+}
+
+type Multiplicador struct {
+	Mtier float64
+	Score int
+	IdUsuario int
+	IdMembresia int
+	IdTemporada int
+}
+
+type SEASON struct {
+	IdSeason int
+}
