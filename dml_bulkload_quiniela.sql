@@ -185,11 +185,13 @@ SELECT * FROM PREDICCION;
 SELECT * FROM MEMBRESIA;
 SELECT * FROM RECOMPENSA WHERE idTemporada = 1;
 SELECT * FROM RECOMPENSA;
+SELECT * FROM USUARIO;
 
+UPDATE USUARIO set photo = 'scorpio.jpg' , fecha_nacimiento = sysdate where idUsuario = 2;
 
 EXEC sp_insert_evento_bl('5/5/5','efe','ef',1,1);
 
-
+COMMIT;
 
 SELECT score, idUsuario, idMembresia FROM DETALLE_USUARIO 
 WHERE idTemporada = 1

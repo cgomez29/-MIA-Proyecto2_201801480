@@ -3,8 +3,12 @@ import {Avatar, Button, Grid, Paper, TextField} from "@material-ui/core";
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import axios from 'axios'
 import url from "../config";
+import moment from "moment";
+import {Redirect} from "react-router-dom";
 
 const SignIn = () => {
+    const [redirect, setRedirect] = useState(false)
+
     // styles
     const paperStyle = {padding: 25, height:'70vh', width:300, margin: "20px auto"}
     const avatarStyle = { backgroundColor:'green'}
@@ -26,32 +30,32 @@ const SignIn = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
     })
 
-    /*const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }*/
-
     const onSubmit = async (e: SyntheticEvent) => {
         e.preventDefault()
 
         const img = file;
 
         const formData = new FormData()
+        let fecha = moment(date).format("YYYY/MM/DD")
+
         formData.append("username", username)
         formData.append("password", password)
         formData.append("name", name)
         formData.append("surname",surname)
+        formData.append("fecha",fecha)
         formData.append("email", email)
-        formData.append("date", date)
         formData.append('file', img)
 
         await instance.post(`${url}/register`, formData)
             .then(res => {
-                console.log(res)
+                setRedirect(true)
             }).catch(err =>{
-                console.log(err)
+                setRedirect(false)
             })
-
     }
+
+    if (redirect)
+        return <Redirect to='/login'/>
 
     return (
         <React.Fragment>
@@ -70,13 +74,13 @@ const SignIn = () => {
                         id="date"
                         label="Birthday"
                         type="date"
-                        defaultValue="2015-05-24"
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        name='date'
                         fullWidth
                         required
-                        onChange={e => setDate(e.target.value) }
+                        onChange={e => setDate(e.target.value)}
                     />
                     <Button variant="contained" component="label" fullWidth style={btnStyle}>
                         Upload photo

@@ -106,7 +106,7 @@ func User(c *fiber.Ctx) error {
 
 	for rows.Next() {
 		rows.Scan(&user.IdUsuario, &user.Username, &user.Name, &user.Surname, &user.Tier,
-					&user.FechaNacimiento, &user.Email, &user.Photo, &user.IdRol)
+					&user.Fecha, &user.Email, &user.Photo, &user.IdRol)
 	}
 	defer rows.Close()
 	fmt.Println(user)
@@ -135,6 +135,7 @@ func Register(c *fiber.Ctx) error {
 		return err
 	}
 
+	fmt.Println("TIER ", data.Tier)
 	// save photo
 	var nameImg string
 
@@ -161,7 +162,7 @@ func Register(c *fiber.Ctx) error {
 	// register
 	//password, _:= bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 	query := fmt.Sprintf("CALL sp_insert_usuario('%s','%s','%s','%s','%s','%s','%s')",
-		data.Username, data.Password, data.Name, data.Surname, data.FechaNacimiento,
+		data.Username, data.Password, data.Name, data.Surname, data.Fecha,
 		nameImg, data.Email)
 	fmt.Println("REGISTER: ",query)
 

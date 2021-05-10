@@ -11,7 +11,6 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import EditIcon from "@material-ui/icons/Edit";
-import CloudUploadOutlinedIcon from '@material-ui/icons/CloudUploadOutlined';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,10 +39,15 @@ const useStyles = makeStyles((theme) => ({
 
 const Deporte = () => {
     const classes = useStyles();
+    const btnStyle = { margin:'8px 0', }
     const [loggedIn, setLoggedIn] = useState(false)
     const [open, setOpen] = React.useState(false);
     const [data, setData] = useState([])
-
+    const [file, setFile] = useState([])
+    const [deporte, setDeporte] = useState({
+        name: '',
+        color: '',
+    })
     const handleOpen = () => {
         setOpen(true);
     };
@@ -54,6 +58,7 @@ const Deporte = () => {
 
     const instance = axios.create({
         withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' },
     })
 
     useEffect(()=>{
@@ -69,7 +74,29 @@ const Deporte = () => {
             }
         )();
 
-    })
+    },[])
+
+    const onSubmit = async (e) => {
+        e.preventDefault()
+        const formaData = new FormData()
+        formaData.append("nombre", deporte.name)
+        formaData.append("color", deporte.color)
+        formaData.append("file", file)
+
+        await instance.post(`${url}/deporte`, formaData)
+            .then(res => {
+                handleClose()
+            }).catch(err => {
+                console.log(err)
+            })
+    }
+
+    const handleInputChange = (e) => {
+        setDeporte({
+            ...deporte,
+            [e.target.name]:e.target.value
+        })
+    }
 
     if (loggedIn)
         return <Redirect to="/login"/>
@@ -118,18 +145,26 @@ const Deporte = () => {
                     <Fade in={open}>
                         <div className={classes.paper}>
                             <h2 id="transition-modal-title"><EditIcon/>Agregar</h2>
-                            <form>
-                                <TextField label='name' placeholder="Enter name" fullWidth required />
-                                <TextField label='Username' placeholder="Enter username" fullWidth required />
-                                <Button startIcon={<CloudUploadOutlinedIcon/>} variant="contained" component="label" fullWidth >
+                            <form onSubmit={onSubmit}>
+                                <TextField label='name' name='name' value={deporte.name} onChange={handleInputChange} placeholder="Enter name" fullWidth required />
+                                <TextField type='color'
+                                           name='color'
+                                           defaultValue="#000"
+                                           value={deporte.color}
+                                           fullWidth
+                                           onChange={handleInputChange}
+                                />
+                                <Button variant="contained" component="label" fullWidth style={btnStyle}>
                                     Upload photo
-                                    <input type="file" name="file"hidden  />
+                                    <input type="file"  hidden onChange={e => setFile(e.target.files[0])} />
                                 </Button>
                                 <Button type="submit" color='primary' variant='contained' fullWidth>
-                                    Guardar
+                                    Agregar
                                 </Button>
                             </form>
-
+                            <Button variant='contained' fullWidth style={btnStyle}>
+                                Cancelar
+                            </Button>
                         </div>
                     </Fade>
                 </Modal>

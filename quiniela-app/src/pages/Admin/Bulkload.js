@@ -4,9 +4,13 @@ import { FilePicker } from "react-file-picker";
 import axios from 'axios';
 import {Button, Grid, Paper} from "@material-ui/core";
 import url from "../../config";
-
+import Loading from '../../components/Loading'
 
 export default class Bulkload extends React.Component {
+    state = {
+        loading: false
+    }
+
     paperStyle = {padding: 25, height:'30vh', width:300, margin: "20px auto"}
     btnSumbitStyle = {margin: '15px 0'};
 
@@ -18,9 +22,6 @@ export default class Bulkload extends React.Component {
             try {
                 const doc = yaml.load(e.target.result);
                 this.load = JSON.stringify(doc);
-                //this.load = doc
-                //console.log(this.load);
-                //console.log(doc['A2'])
                 this.onSubmit();
             } catch (e) {
                 console.log(e);
@@ -29,17 +30,36 @@ export default class Bulkload extends React.Component {
 
         this.setState({ title: file.name });
     };
-    onSubmit = async () => {
 
-        console.log(this.load)
-        /*await axios.post(`${url}/bulkload`, this.load)
+    instance = axios.create({
+        withCredentials: true,
+    })
+
+    onSubmit = async () => {
+        this.setState({
+            loading: true
+        })
+        await this.instance.post(`${url}/bulkload`
+            ,this.load
+            ,{headers: {
+                    'Content-Type': 'application/json',
+                }})
             .then(res => {
                 console.log(res)
+                this.setState({
+                    loading: false
+                })
             }).catch(err =>{
                 console.log(err)
-            })*/
+                this.setState({
+                    loading: false
+                })
+            })
     };
     render() {
+        if (this.state.loading)
+            return <Loading/>
+
         return (
             <div className="container">
                 <Paper elevation={10} style={this.paperStyle}>

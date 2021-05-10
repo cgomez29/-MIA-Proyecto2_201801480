@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -12,6 +12,17 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import EditIcon from '@material-ui/icons/Edit';
+import axios from "axios";
+import url from "../config";
+import {TextField} from "@material-ui/core";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,9 +49,48 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const CardG = ({name, img, color}) => {
+const CardG = ({idDeporte,name, file}) => {
+    const [file2, setFile] = useState(null)
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const btnStyle = { margin:'8px 0', }
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const [openDialog, setOpenDialog] = React.useState(false);
+    const [data, setData] = useState({
+        color: '',
+        file: '',
+    })
+
+    const handleClickOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const loadDeporte = async () => {
+        const instance = axios.create({
+            withCredentials: true,
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        console.log(`${url}/deporte/${idDeporte}`)
+        await instance.get(`${url}/deporte/${idDeporte}`).then(res => {
+            setData(res.data)
+        })
+    }
+
+    useEffect(() => {
+        loadDeporte();
+    }, [])
+
+    const handleInputChange = (e:InputEvent) => {
+        setData({
+            ...data,
+            [e.target.name]:e.target.value
+        })
+    }
 
     const handleOpen = () => {
         setOpen(true);
@@ -50,13 +100,48 @@ const CardG = ({name, img, color}) => {
         setOpen(false);
     };
 
+    const instance = axios.create({
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' },
+    })
+
+    const onSubmit = async (e) => {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append("color", data.color)
+        if (file != null) {
+            formData.append('file', file2)
+        } else {
+            formData.append('file', data.file)
+        }
+
+        await instance.put(`${url}/deporte/${idDeporte}`, formData)
+            .then(res => {
+                handleClose()
+            }).catch(err =>{
+                console.log(err)
+            })
+
+    }
+
+    const onSubmitDelete = async (e) => {
+        e.preventDefault()
+        await instance.delete(`${url}/deporte/${idDeporte}`)
+            .then(res => {
+                handleCloseDialog()
+            }).catch(err =>{
+                console.log(err)
+            })
+
+    }
+
     return (
         <React.Fragment>
             <Card className={classes.root}>
                 <CardActionArea>
                     <CardMedia
                         className={classes.media}
-                        image={img || noImg}
+                        image={`${url}/img/${file}` || noImg}
                         title="Contemplative Reptile"
                     />
                     <CardContent>
@@ -73,7 +158,9 @@ const CardG = ({name, img, color}) => {
                     <Button size="small" color="primary" onClick={handleOpen}>
                         Editar
                     </Button>
-                    <Button size="small" color="primary">
+                    <Button size="small" color="primary"
+                        onClick={handleClickOpenDialog}
+                    >
                         Eliminar
                     </Button>
                 </CardActions>
@@ -93,14 +180,59 @@ const CardG = ({name, img, color}) => {
                 >
                     <Fade in={open}>
                         <div className={classes.paper}>
-                            <EditIcon/>
-                            <h2 id="transition-modal-title">Editar</h2>
+
+                            <h2 id="transition-modal-title"><EditIcon/>Editar: {name}</h2>
                             <p id="transition-modal-description">
-                                { color }
+                                <form onSubmit={onSubmit}>
+                                    <TextField type='color'
+                                               name='color'
+                                               defaultValue="#000"
+                                               value={data.color}
+                                               fullWidth
+                                               onChange={handleInputChange}
+                                    />
+                                    <TextField disabled name='file' value={data.file} fullWidth onChange={handleInputChange}/>
+                                    <Button variant="contained" component="label" fullWidth style={btnStyle}>
+                                        Upload photo
+                                        <input type="file"  hidden onChange={e => setFile(e.target.files[0])} />
+                                    </Button>
+                                    <Button type="submit"  color='primary' variant='contained' fullWidth style={btnStyle}
+                                    >Guardar</Button>
+                                </form>
+                                <Button variant='contained' onClick={handleClose} fullWidth style={btnStyle}
+                                >Cancelar</Button>
                             </p>
                         </div>
                     </Fade>
                 </Modal>
+            </div>
+            <div>
+                <Dialog
+                    fullScreen={fullScreen}
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="responsive-dialog-title"
+                >
+                    <DialogTitle id="responsive-dialog-title">
+                        <DeleteIcon/>
+                        Esta seguro que desea eliminar el deporte {name}?
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Este proceso no es reversible.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button autoFocus onClick={handleCloseDialog} color="primary">
+                            Cancelar
+                        </Button>
+                        <form onSubmit={onSubmitDelete}>
+                            <Button type='submit' color="primary">
+                                Aceptar
+                            </Button>
+                        </form>
+                    </DialogActions>
+                </Dialog>
             </div>
         </React.Fragment>
     )

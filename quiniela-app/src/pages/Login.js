@@ -40,7 +40,8 @@ const LoginPage = () => {
                 }
 
                 setRol(res.data.idRol)
-                setSrc(`${url}/img/${res.data.img}`)
+                setSrc(`${url}/img/${res.data.file}`)
+                console.log(res.data.file)
             })
     }
 

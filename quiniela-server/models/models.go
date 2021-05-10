@@ -9,9 +9,9 @@ type USUARIO struct {
 	Name string `json:"name"`
 	Surname string `json:"surname"`
 	Tier string `json:"tier"`
-	FechaNacimiento string `json:"date"`
+	Fecha string `json:"fecha"`
 	Email string `json:"email"`
-	Photo string `json:"img"`
+	Photo string `json:"file"`
 	IdRol uint `json:"idRol"`
 }
 
@@ -28,7 +28,7 @@ type ArrayPrueba []Prueba
 type DEPORTE struct {
 	IdDeporte uint `json:"idDeporte"`
 	Nombre string `json:"name"`
-	Imagen string `json:"img"`
+	Imagen string `json:"file"`
 	Color string `json:"color"`
 }
 

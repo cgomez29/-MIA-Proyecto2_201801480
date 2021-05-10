@@ -11,6 +11,11 @@ import Temporada from "./pages/Admin/Temporada";
 import Deporte from "./pages/Admin/Deporte";
 import Jornada from "./pages/Admin/Jornada";
 import HomeAdmin from './pages/Admin/Home'
+import HomeUser from './pages/User/Home'
+import PerfilUser from './pages/User/Perfil'
+import MembresiaUser from './pages/User/Membresia'
+import RecompensaUser from './pages/User/Recompensa'
+import EventoUser from './pages/User/Evento'
 import {UserContext} from "./Context/UserContext";
 import Bulkload from "./pages/Admin/Bulkload";
 
@@ -27,7 +32,7 @@ const App = () => {
             await instance.get( `${url}/user`)
                 .then(res => {
                     setRol(res.data.idRol)
-                    setSrc(`${url}/img/${res.data.img}`)
+                    setSrc(`${url}/img/${res.data.file}`)
                 })
         }
         axiosDeportes()
@@ -47,6 +52,12 @@ const App = () => {
                     <Route exact path="/admin/deporte" component={Deporte}/>
                     <Route exact path="/admin/jornada" component={Jornada}/>
                     <Route exact path="/admin/bulkload" component={Bulkload}/>
+
+                    <Route exact path="/user" component={HomeUser}/>
+                    <Route exact path="/user/evento" component={EventoUser}/>
+                    <Route exact path="/user/recompensa" component={RecompensaUser}/>
+                    <Route exact path="/user/perfil" component={PerfilUser}/>
+                    <Route exact path="/user/Membresia" component={MembresiaUser}/>
 
                     <Route component={NotFound}/>
 

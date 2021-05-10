@@ -21,6 +21,10 @@ import DateRangeIcon from '@material-ui/icons/DateRange';
 import SportsFootballIcon from '@material-ui/icons/SportsFootball';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import BackupIcon from '@material-ui/icons/Backup';
+import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 const StyledBadge = withStyles((theme) => ({
     badge: {
@@ -92,7 +96,6 @@ const Nav = () => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
         }
-
         setState({ ...state, [anchor]: open });
     };
     let menuList;
@@ -110,19 +113,57 @@ const Nav = () => {
                 <List>
                     <ListItem component={Link} to="/admin/bulkload">
                         <ListItemIcon> <BackupIcon /> </ListItemIcon>
-                        <ListItemText> Carga Masiva  </ListItemText>
+                        <ListItemText> CARGA MASIVA  </ListItemText>
                     </ListItem>
                     <ListItem  component={Link} to="/admin/temporada" >
                         <ListItemIcon> <CalendarTodayIcon /> </ListItemIcon>
-                        <ListItemText> TEMPORADA </ListItemText>
+                        <ListItemText> TEMPORADAS </ListItemText>
                     </ListItem>
                     <ListItem component={Link} to="/admin/jornada">
                         <ListItemIcon> <DateRangeIcon /> </ListItemIcon>
-                        <ListItemText> JORNADA </ListItemText>
+                        <ListItemText> JORNADAS </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/admin/jornada">
+                        <ListItemIcon> <AssignmentIcon /> </ListItemIcon>
+                        <ListItemText> RESULTADOS </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/admin/jornada">
+                        <ListItemIcon> <CardGiftcardIcon /> </ListItemIcon>
+                        <ListItemText> RECOMPENSAS </ListItemText>
                     </ListItem>
                     <ListItem component={Link} to="/admin/deporte">
                         <ListItemIcon> <SportsFootballIcon /> </ListItemIcon>
                         <ListItemText> DEPORTES </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/admin/jornada">
+                        <ListItemIcon> <AssessmentIcon /> </ListItemIcon>
+                        <ListItemText> REPORTES </ListItemText>
+                    </ListItem>
+                </List>
+            </React.Fragment>
+        )
+    } else if (rol===2) {
+        menuList = (
+            <React.Fragment>
+                <List>
+                    <ListItem component={Link} to="/user">
+                        <ListItemIcon> <HomeIcon /> </ListItemIcon>
+                        <ListItemText> HOME </ListItemText>
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    <ListItem  component={Link} to="/user/evento" >
+                        <ListItemIcon> <CalendarTodayIcon /> </ListItemIcon>
+                        <ListItemText> EVENTOS </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/user/recompensa">
+                        <ListItemIcon> <CardGiftcardIcon /> </ListItemIcon>
+                        <ListItemText> RECOMPENSAS </ListItemText>
+                    </ListItem>
+                    <ListItem component={Link} to="/user/membresia">
+                        <ListItemIcon> <MonetizationOnIcon /> </ListItemIcon>
+                        <ListItemText> MEMBRESIA </ListItemText>
                     </ListItem>
                 </List>
             </React.Fragment>
@@ -130,7 +171,6 @@ const Nav = () => {
     }
 
     const list = (anchor) => (
-
 
         <div
             className={clsx(classes.list, {
@@ -171,8 +211,6 @@ const Nav = () => {
     let menu;
 
     if (rol===2) {
-        console.log(src)
-
         menu = (
             <React.Fragment>
                 <IconButton onClick={toggleDrawer('left', true)} color="inherit" aria-label="menu" className={classes.menuButton}>
@@ -222,7 +260,7 @@ const Nav = () => {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={handleClose}>Perfil</MenuItem>
+                        <MenuItem component={Link} to="/user/perfil" onClick={handleClose}>Perfil</MenuItem>
                         <MenuItem component={Link} to="/login" onClick={logout}>Logout</MenuItem>
                     </Menu>
                 </div>
@@ -282,7 +320,6 @@ const Nav = () => {
                         <MenuItem component={Link} to="/login" onClick={logout}>Logout</MenuItem>
                     </Menu>
                 </div>
-
             </React.Fragment>
         )
     } else {

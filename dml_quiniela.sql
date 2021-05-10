@@ -9,7 +9,7 @@ TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisg
 -- CLIENT
 INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
 VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',2);
+TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','scorpio.jpg',2);
 
 -- Tier 
 INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Bronze', 150); 
@@ -46,7 +46,37 @@ BEGIN
     (TO_TIMESTAMP(v_fecha_nacimiento, 'YYYY-MM-DD HH24:MI:SS.FF')),
     SYSTIMESTAMP,v_email,v_photo,2);
 END;
-       
+
+
+
+CREATE OR REPLACE PROCEDURE sp_update_usuario_membresia ( 
+    v_tier IN VARCHAR2,
+    v_idUsuario IN NUMBER
+    )
+AS
+BEGIN
+    UPDATE USUARIO SET tier = v_tier WHERE idUsuario = v_idUsuario;
+    COMMIT;
+END;
+
+CREATE OR REPLACE PROCEDURE sp_update_usuario ( 
+    v_username IN VARCHAR2,
+    v_password IN VARCHAR2,
+    v_name IN VARCHAR2,
+    v_surname IN VARCHAR2,
+    v_fecha_nacimiento IN VARCHAR2,
+    v_photo IN VARCHAR2,
+    v_email IN VARCHAR2,
+    v_idUsuario IN NUMBER
+    )
+AS
+BEGIN
+    UPDATE USUARIO SET username = v_username, password = v_password, name = v_name, surname = v_surname,
+        fecha_nacimiento = (TO_TIMESTAMP(v_fecha_nacimiento, 'YYYY-MM-DD HH24:MI:SS.FF')), email = v_email,
+        photo = v_photo WHERE idUsuario = v_idUsuario;
+    COMMIT;
+END;
+   
 CREATE OR REPLACE VIEW v_user AS
 SELECT 
     idUsuario,username, name, surname, tier,fecha_nacimiento, email, photo, idRol
@@ -151,14 +181,14 @@ insert into Prueba(nombre) VALUES('cris');
 
 /* DEPORTE */
 CREATE OR REPLACE PROCEDURE sp_insert_deporte (
-    nombre IN VARCHAR,    
-    imagen IN VARCHAR,    
-    color IN VARCHAR    
+    v_nombre IN VARCHAR,    
+    v_imagen IN VARCHAR,    
+    v_color IN VARCHAR    
 )
 AS 
 BEGIN
     INSERT INTO DEPORTE(nombre, imagen, color) 
-    VALUES (nombre, imagen, color);
+    VALUES (v_nombre, v_imagen, v_color);
     COMMIT;
 END;
 
@@ -173,13 +203,13 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE sp_update_deporte (
-    imagen IN VARCHAR,    
-    color IN VARCHAR,
-    idDeporte IN NUMBER
+    v_imagen IN VARCHAR,    
+    v_color IN VARCHAR,
+    v_idDeporte IN NUMBER
 )
 AS 
 BEGIN
-    UPDATE DEPORTE SET imagen = imagen, color = color WHERE idDeporte = idDeporte;
+    UPDATE DEPORTE SET imagen = v_imagen, color = v_color WHERE idDeporte = v_idDeporte;
     COMMIT;
 END;
 
