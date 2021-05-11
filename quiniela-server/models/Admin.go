@@ -78,6 +78,30 @@ type EVENTO struct {
 	IdDeporte int `json:"idDeporte"`
 }
 
+type ArrayEvento []EVENTO
+
+type EVENTOCALENDAR struct {
+	IdEvento int `json:"idEvento"`
+	FechaHora string `json:"fechahoras"`
+	Estado int `json:"estado"`
+	Local string `json:"local"`
+	Visitante string `json:"visitante"`
+	Color string `json:"color"`
+	IdJornada int `json:"idJornada"`
+	IdDeporte int `json:"idDeporte"`
+}
+
+type ArrayEventoCalendar []EVENTOCALENDAR
+
+type EVENTCALENDAR struct {
+	IdEvento int `json:"id"`
+	Title string `json:"title"`
+	FechaHora string `json:"start"`
+	Color string `json:"color"`
+}
+
+type ArrayEventCalendar []EVENTCALENDAR
+
 /* PREDICCIONES */
 type PREDICCION struct {
 	IdPrediccion int `json:"idPrediccion"`

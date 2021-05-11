@@ -4,12 +4,12 @@ INSERT INTO ROL(name) VALUES ('cliente');
  
 -- ADMIN
 INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
-VALUES ('cris','cris','Cristian','Gomez','GOLD',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','localhost',1);
+VALUES ('cris','cris','Cristian','Gomez','GOLD',TO_TIMESTAMP('29-10-1998', 'DD-MM-YYYY'),
+TO_DATE('29-10-1998', 'DD-MM-YYYY'),'crisgomez029@gmail.com','localhost',1);
 -- CLIENT
 INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
-VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),
-TO_TIMESTAMP('1998-10-29 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'),'crisgomez029@gmail.com','scorpio.jpg',2);
+VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('29-10-1998', 'DD-MM-YYYY'),
+TO_DATE('29-10-1998', 'DD-MM-YYYY'),'crisgomez029@gmail.com','scorpio.jpg',2);
 
 -- Tier 
 INSERT INTO MEMBRESIA(nombre, precio) VALUES ('Bronze', 150); 
@@ -43,7 +43,7 @@ AS
 BEGIN
     INSERT INTO USUARIO(username, password, name, surname, tier,fecha_nacimiento, fecha_registro, email, photo, idRol)
     VALUES (v_username, v_password, v_name, v_surname,'-',
-    (TO_TIMESTAMP(v_fecha_nacimiento, 'YYYY-MM-DD HH24:MI:SS.FF')),
+    (TO_TIMESTAMP(v_fecha_nacimiento, 'DD-MM-YYYY HH24:MI')),
     SYSTIMESTAMP,v_email,v_photo,2);
 END;
 
@@ -72,7 +72,7 @@ CREATE OR REPLACE PROCEDURE sp_update_usuario (
 AS
 BEGIN
     UPDATE USUARIO SET username = v_username, password = v_password, name = v_name, surname = v_surname,
-        fecha_nacimiento = (TO_TIMESTAMP(v_fecha_nacimiento, 'YYYY-MM-DD HH24:MI:SS.FF')), email = v_email,
+        fecha_nacimiento = (TO_TIMESTAMP(v_fecha_nacimiento, 'DD-MM-YYYY HH24:MI')), email = v_email,
         photo = v_photo WHERE idUsuario = v_idUsuario;
     COMMIT;
 END;
@@ -212,6 +212,22 @@ BEGIN
     UPDATE DEPORTE SET imagen = v_imagen, color = v_color WHERE idDeporte = v_idDeporte;
     COMMIT;
 END;
+
+
+/*PREDICCION*/
+CREATE OR REPLACE PROCEDURE sp_insert_prediccion ( 
+    v_local IN NUMBER,
+    v_visitante IN NUMBER,
+    v_idEvento IN NUMBER,
+    v_idUsuario IN NUMBER
+    )
+AS
+BEGIN
+    INSERT INTO PREDICCION(local, visitante, idEvento, idUsuario) 
+    VALUES (v_local, v_visitante,v_idEvento, v_idUsuario);
+    COMMIT;
+END;
+
 
 
 /**

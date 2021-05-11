@@ -1,11 +1,15 @@
 import React from 'react';
-import {Grid} from "@material-ui/core";
+import {Button, Grid} from "@material-ui/core";
+import JornadaFullCalendar from "../../components/Admin/JornadaFullCalendar";
 
 const Jornada = () => {
     return (
-        <Grid container>
-            JORNADA :)
-        </Grid>
+        <React.Fragment>
+            <Grid container>
+                <Button variant="contained" color="primary" style={{margin: 5}}>Agregar Evento</Button>
+            </Grid>
+            <JornadaFullCalendar/>
+        </React.Fragment>
     );
 };
 

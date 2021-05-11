@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber"
 	"strconv"
+	"strings"
+	"time"
 )
 
 var allSeason []models.SEASON
@@ -262,7 +264,7 @@ func Bulk(data models.Temporal)  {
 			//CREANDO JORNADAS
 			semana := fmt.Sprintf("%s",j.Jornada[1:])
 			query = fmt.Sprintf("CALL sp_insert_jornada_bl('%s','%s',%s,%s)",
-				j.Jornada, dateTemporada, semana, strconv.Itoa(int(temporada.IdTemporada)))
+				j.Jornada, strings.ReplaceAll(strings.Split(dateTemporada, " ")[0], "/","-"), semana, strconv.Itoa(int(temporada.IdTemporada)))
 			database.Execute(query)
 
 			//Obteniendo id Jornada actual
@@ -292,12 +294,12 @@ func Bulk(data models.Temporal)  {
 
 				//CREANDO EVENTOS
 				query = fmt.Sprintf("CALL sp_insert_evento_bl('%s','%s','%s',%s,%s)",
-					k.Fecha, k.Local, k.Visitante, strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)))
+					strings.ReplaceAll(k.Fecha, "/","-"), k.Local, k.Visitante, strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)))
 				database.Execute(query)
 
 				//OBTENIENDO id de EVENTO
-				query = fmt.Sprintf("SELECT idEvento FROM EVENTO WHERE idJornada = %s AND idDeporte = %s AND fecha_hora = TO_TIMESTAMP('%s', 'YYYY-MM-DD HH24:MI:SS.FF')",
-					strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)), k.Fecha)
+				query = fmt.Sprintf("SELECT idEvento FROM EVENTO WHERE idJornada = %s AND idDeporte = %s AND fecha_hora = TO_TIMESTAMP('%s', 'DD-MM-YYYY HH24:MI')",
+					strconv.Itoa(jornada.IdJornada), strconv.Itoa(int(deporte.IdDeporte)), strings.ReplaceAll(k.Fecha, "/","-") )
 
 				rows,_ = database.ExecuteQuery(query)
 
@@ -479,4 +481,13 @@ func Rewards() {
 			database.Execute(query)
 		}
 	}
+}
+
+//TemporadaActual crea la temporada si no existe
+func TemporadaActual()  {
+	t := time.Now()
+	month := t.Month() // type time.Month
+	year := t.Year() // type time.Month
+	fecha := fmt.Sprintf("1-%s-%s",strconv.Itoa(int(month)),strconv.Itoa(int(year)))
+	fmt.Println(fecha)
 }

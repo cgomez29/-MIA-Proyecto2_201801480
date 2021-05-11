@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./controller"
 	"./database"
 	"./route"
 	"github.com/gofiber/fiber"
@@ -17,6 +18,9 @@ func main() {
 	}))
 
 	route.Setup(app)
+
+	//Crea automaticamente la temporada si no existe
+	controller.TemporadaActual()
 
 	app.Listen(":8000")
 }

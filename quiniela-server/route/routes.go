@@ -28,4 +28,11 @@ func Setup(app *fiber.App) {
 	//CARGAR ARCHIVO
 	app.Post("/api/bulkload",controller.BulkLoad)
 
+	//EVENTO
+	app.Get("api/evento",controller.GetEventos)
+
+	//PREDICCION
+	app.Get("api/prediccion/:id", controller.GetPrediccion)
+	app.Post("api/prediccion", controller.PostPrediccion)
+
 }

@@ -216,16 +216,3 @@ func DeleteDeporte(c *fiber.Ctx) error {
 		"message": "Delete Successful",
 	})
 }
-
-/*
-	"idDeporte": 9
-	"name": "prueba",
-	"img": "xp",
-	"color": "gris"
-
-{
-	"name": "prueba",
-	"img": "xp",
-	"color": "gris"
-}
-*/

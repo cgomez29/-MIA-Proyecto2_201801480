@@ -33,7 +33,7 @@ CREATE OR REPLACE PROCEDURE sp_insert_temporada_bl (
 AS
 BEGIN
     INSERT INTO TEMPORADA(nombre, fechainicio, fechafin, estado)
-    VALUES (v_name, TO_DATE(v_fecha_inicio_fin, 'yyyy/mm/dd'), LAST_DAY(TO_DATE(v_fecha_inicio_fin, 'yyyy/mm/dd')), 0);
+    VALUES (v_name, TO_DATE(v_fecha_inicio_fin, 'yyyy-mm-dd'), LAST_DAY(TO_DATE(v_fecha_inicio_fin, 'yyyy-mm-dd')), 0);
     COMMIT;
 END;
 
@@ -77,32 +77,37 @@ CREATE OR REPLACE PROCEDURE sp_insert_jornada_bl (
     v_temporada IN NUMBER
     )
 AS
+    rowU NUMBER(1) := 0;
 BEGIN
 
-    IF (v_semana = 1 ) THEN    
-        INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
-        VALUES (v_name, TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF'), (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+7),
-                1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
-    END IF;
+    SELECT COUNT(idJornada) INTO rowU FROM JORNADA WHERE name = v_name AND 
+    idTemporada = v_temporada;
     
-    IF (v_semana = 2 ) THEN    
-        INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
-        VALUES (v_name, (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+7), (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+14),
-                1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
+    IF rowU = 0 THEN 
+        IF (v_semana = 1 ) THEN    
+            INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
+            VALUES (v_name, TO_DATE(v_fecha_inicio, 'YYYY-MM-DD'), (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+7),
+                    1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
+        END IF;
+        
+        IF (v_semana = 2 ) THEN    
+            INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
+            VALUES (v_name, (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+7), (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+14),
+                    1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
+        END IF;
+     
+        IF (v_semana = 3 ) THEN    
+            INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
+            VALUES (v_name, (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+14), (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+21),
+                    1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
+        END IF;
+        
+        IF (v_semana = 4 ) THEN    
+            INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
+            VALUES (v_name, (TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')+21),LAST_DAY(TO_DATE(v_fecha_inicio, 'YYYY-MM-DD')) ,
+                    1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
+        END IF;
     END IF;
- 
-    IF (v_semana = 3 ) THEN    
-        INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
-        VALUES (v_name, (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+14), (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+21),
-                1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
-    END IF;
-    
-    IF (v_semana = 4 ) THEN    
-        INSERT INTO JORNADA(name, fecha_hora_inicio, fecha_hora_fin, idFase, idTemporada)
-        VALUES (v_name, (TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')+21),LAST_DAY(TO_TIMESTAMP(v_fecha_inicio, 'YYYY-MM-DD HH24:MI:SS.FF')) ,
-                1, v_temporada); -- VERIFICAR EN QUE FASE ES QUE ENTRA LA JORNADA CARGADA
-    END IF;
-    
     -- COMMIT;
 END;
 
@@ -115,11 +120,18 @@ CREATE OR REPLACE PROCEDURE sp_insert_evento_bl (
     v_idDeporte IN NUMBER
     )
 AS
+    rowU NUMBER(1) := 0;
 BEGIN
-    INSERT INTO EVENTO(fecha_hora, estado, local, visitante, idJornada, idDeporte)
-    VALUES (TO_TIMESTAMP(v_fechahora, 'YYYY-MM-DD HH24:MI:SS.FF'), 0, v_local, v_visitante,
-            v_idJornada, v_idDeporte);
-    COMMIT;
+
+    SELECT COUNT(idEvento) INTO rowU FROM EVENTO WHERE fecha_hora = TO_DATE(v_fechahora, 'DD-MM-YYYY HH24:MI') AND
+    local = v_local AND visitante = v_visitante AND idJornada = v_idJornada AND idDeporte = v_idDeporte;
+    
+    IF rowU = 0 THEN 
+        INSERT INTO EVENTO(fecha_hora, estado, local, visitante,color, idJornada, idDeporte)
+        VALUES (TO_DATE(v_fechahora, 'DD-MM-YYYY HH24:MI'), 0, v_local, v_visitante,'#8d8f91',
+                v_idJornada, v_idDeporte);
+        COMMIT;
+    END IF;
 END;
 
 /*RESULTADO*/
@@ -129,10 +141,16 @@ CREATE OR REPLACE PROCEDURE sp_insert_resultado_bl (
     v_idEvento IN NUMBER
     )
 AS
+    rowU NUMBER(1) := 0;
 BEGIN
-    INSERT INTO RESULTADO(visitante, local, idEvento) 
-    VALUES (v_visitante, v_local, v_idEvento);
-    COMMIT;
+
+    SELECT COUNT(idResultado) INTO rowU FROM RESULTADO WHERE idEvento = v_idEvento;
+    
+    IF rowU = 0 THEN
+        INSERT INTO RESULTADO(visitante, local, idEvento) 
+        VALUES (v_visitante, v_local, v_idEvento);
+        COMMIT;
+    END IF;
 END;
 
 /*PREDICCION*/
@@ -143,15 +161,20 @@ CREATE OR REPLACE PROCEDURE sp_insert_prediccion_bl (
     v_idUsuario IN NUMBER
     )
 AS
+    rowU NUMBER(1) := 0;
 BEGIN
-    INSERT INTO PREDICCION(local, visitante, idEvento, idUsuario) 
-    VALUES (v_local, v_visitante,v_idEvento, v_idUsuario);
-    COMMIT;
+
+    SELECT COUNT(idPrediccion) INTO rowU FROM PREDICCION WHERE idEvento = v_idEvento AND 
+    idUsuario = v_idUsuario;
+    
+    IF rowU = 0 THEN
+        INSERT INTO PREDICCION(local, visitante, idEvento, idUsuario) 
+        VALUES (v_local, v_visitante,v_idEvento, v_idUsuario);
+        COMMIT;
+    END IF;
 END;
 
-
 /* RECOMPENSA */
-
 CREATE OR REPLACE PROCEDURE sp_insert_recompensa_bl ( 
     v_score IN NUMBER,
     v_premio IN FLOAT,
@@ -167,42 +190,44 @@ BEGIN
 END;
 
 
+
+
 /*EXEC sp_insert_jornada_bl ('J1', '2018/3/1', 1, 1);
 EXEC sp_insert_jornada_bl ('J2', '2018/3/1', 2, 1);
 EXEC sp_insert_jornada_bl ('J3', '2018/3/1', 3, 1);
 EXEC sp_insert_jornada_bl ('J4', '2018/3/1', 4, 1);*/
 
+--alter SESSION set NLS_DATE_FORMAT = 'DD-MM-YYYY HH24:MI'
+alter SESSION set NLS_DATE_FORMAT = 'DD-MM-YYYY HH24:MI'
+
+COMMIT;
 
 
-SELECT * FROM USUARIO;
+SELECT * FROM USUARIO where idUsuario = 17;
 SELECT * FROM TEMPORADA;
-SELECT * FROM DETALLE_USUARIO WHERE idTemporada = 3;
+SELECT * FROM DETALLE_USUARIO;
 SELECT * FROM JORNADA;
 SELECT * FROM DEPORTE;
-SELECT * FROM EVENTO;
+SELECT * FROM EVENTO where idEvento = 9;
 SELECT * FROM RESULTADO;
-SELECT * FROM PREDICCION;
+SELECT * FROM PREDICCION WHERE idUsuario = 2;
 SELECT * FROM MEMBRESIA;
 SELECT * FROM RECOMPENSA WHERE idTemporada = 1;
 SELECT * FROM RECOMPENSA;
 SELECT * FROM USUARIO;
-
-UPDATE USUARIO set photo = 'scorpio.jpg' , fecha_nacimiento = sysdate where idUsuario = 2;
-
-EXEC sp_insert_evento_bl('5/5/5','efe','ef',1,1);
-
-COMMIT;
-
-SELECT score, idUsuario, idMembresia FROM DETALLE_USUARIO 
-WHERE idTemporada = 1
-ORDER BY score DESC FETCH FIRST 3 ROWS ONLY;
-
-SELECT * FROM DETALLE_USUARIO ;
-
-SELECT COUNT(idMembresia), idMembresia FROM DETALLE_USUARIO WHERE idTemporada = 1 GROUP BY idMembresia;
+SELECT * FROM FASE;
 
 
-COMMIT;
+SELECT idTemporada FROM TEMPORADA WHERE fechainicio = '1-6-2018';
+
+SELECT COUNT(id_detalle_usuario) FROM DETALLE_USUARIO WHERE idTemporada = 177;
+
+SELECT idUsuario FROM USUARIO WHERE tier != '-' AND idRol = 2;
+
+
+
+SELECT * FROM TEMPORADA;
+
 -- 1 8 15  22
 
 

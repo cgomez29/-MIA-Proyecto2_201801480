@@ -34,3 +34,12 @@ type DEPORTE struct {
 
 type ArrayDeporte []DEPORTE
 /* END DEPORTES*/
+
+/* PREDICCIONES Usuario */
+type PREDICCION_USUARIO struct {
+	IdPrediccion int `json:"idPrediccion"`
+	Local string `json:"local"`
+	Visitante string `json:"visitante"`
+	IdEvento string `json:"idEvento"`
+	IdUsuario int `json:"idUsuario"`
+}
