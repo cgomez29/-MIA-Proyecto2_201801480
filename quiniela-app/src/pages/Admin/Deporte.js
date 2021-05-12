@@ -41,7 +41,7 @@ const Deporte = () => {
     const classes = useStyles();
     const btnStyle = { margin:'8px 0', }
     const [loggedIn, setLoggedIn] = useState(false)
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const [data, setData] = useState([])
     const [file, setFile] = useState([])
     const [deporte, setDeporte] = useState({

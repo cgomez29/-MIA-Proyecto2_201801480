@@ -8,7 +8,7 @@ VALUES ('cris','cris','Cristian','Gomez','GOLD',TO_TIMESTAMP('29-10-1998', 'DD-M
 TO_DATE('29-10-1998', 'DD-MM-YYYY'),'crisgomez029@gmail.com','localhost',1);
 -- CLIENT
 INSERT INTO USUARIO(username, password, name, surname, tier, fecha_nacimiento, fecha_registro, email, photo, idRol)
-VALUES ('alex','alex','Alexander','Gomez','-',TO_TIMESTAMP('29-10-1998', 'DD-MM-YYYY'),
+VALUES ('alex','alex','Alexander','Gomez','3',TO_TIMESTAMP('29-10-1998', 'DD-MM-YYYY'),
 TO_DATE('29-10-1998', 'DD-MM-YYYY'),'crisgomez029@gmail.com','scorpio.jpg',2);
 
 -- Tier 
@@ -294,15 +294,12 @@ END;
 
 
 
-
-
-select LENGTH(password), password from USUARIO;
-
-DELETE FROM CLIENTE WHERE idCliente = 4;
-SELECT * from usuario;
-
-
-commit;
+/* Catidad de participantes por cada tier */
+SELECT COUNT(idMembresia), idMembresia 
+FROM DETALLE_USUARIO 
+INNER JOIN TEMPORADA ON DETALLE_USUARIO.idTemporada = TEMPORADA.idTemporada
+WHERE TEMPORADA.nombre = '2021-Q5' 
+GROUP BY idMembresia;
 
 
 /* END DEPORTE */
@@ -312,7 +309,7 @@ select * from DEPORTE;
 EXECUT sp_delete_deporte(25);
 
 
-DROP TABLE PREDICCION;
+/*DROP TABLE PREDICCION;
 -- DROP TABLE DETALLE_EVENTO;
 DROP TABLE RESULTADO;
 -- DROP TABLE EQUIPO;
@@ -326,4 +323,4 @@ DROP TABLE USUARIO;
 DROP TABLE TEMPORADA;
 DROP TABLE MEMBRESIA;
 DROP TABLE DEPORTE;
-DROP TABLE FASE; 
+DROP TABLE FASE; */

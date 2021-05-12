@@ -445,19 +445,24 @@ func Rewards() {
 			winners =  append(winners, user)
 		}
 		// REALIZANDO LA SUMATORIA DE MULTIPLICADORES DE TIER
+		var key = 0
 		var sumatoria float64
-		for key, j:= range winners {
+		for _, j:= range winners {
 			if key == 0 { //GOLD
 				sumatoria += b_first*j.Mtier
+				key++
 			} else if key == 1 { //SILVER
 				sumatoria += b_second*j.Mtier
+				key++
 			} else { //BRONZE
 				sumatoria += b_third*j.Mtier
 			}
 		}
 		// CALCULANDO LOS PREMIOS
 		var tierString string
-		for key, j:= range winners {
+		key = 0
+		for _, j:= range winners {
+			fmt.Println("KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",key)
 			if j.IdMembresia == 3 { //GOLD
 				tierString = "Gold"
 			} else if j.IdMembresia == 2 { //SILVER
@@ -468,8 +473,10 @@ func Rewards() {
 
 			if key == 0 { //Primer lugar
 				premio = float64(total) * premio_total * b_first * (1 + j.Mtier - sumatoria)
+				key++
 			} else if key == 1 { //Segundo Lugar
 				premio = float64(total) * premio_total * b_second * (1 + j.Mtier - sumatoria)
+				key++
 			} else { //Tercer lugar
 				premio = float64(total) * premio_total * b_third * (1 + j.Mtier - sumatoria)
 			}
@@ -489,5 +496,153 @@ func TemporadaActual()  {
 	month := t.Month() // type time.Month
 	year := t.Year() // type time.Month
 	fecha := fmt.Sprintf("1-%s-%s",strconv.Itoa(int(month)),strconv.Itoa(int(year)))
-	fmt.Println(fecha)
+	fecha_inicio := fmt.Sprintf("%s-%s-01",strconv.Itoa(int(year)),"05")
+	name := fmt.Sprintf("%s-Q%s",strconv.Itoa(int(year)),strconv.Itoa(int(month)))
+
+	query := fmt.Sprintf("CALL sp_insert_temporada_actual('%s','%s','%s')",
+		name, fecha, fecha_inicio)
+	database.Execute(query)
+
+	var idTemporada int
+	var idUsuario int
+	var tier string
+	//Obteniendo el id de la temporada actual
+	query = fmt.Sprintf("SELECT idTemporada FROM TEMPORADA WHERE nombre = '%s' ", name)
+
+	rows,err := database.ExecuteQuery(query)
+
+	if err != nil  {
+		return
+	}
+
+	for rows.Next() {
+		rows.Scan(&idTemporada)
+	}
+	//Obteniendo usuario y su tier
+	query = "SELECT idUsuario, tier FROM USUARIO WHERE tier != '-' AND idRol = 2"
+
+	rows,err = database.ExecuteQuery(query)
+
+	if err != nil  {
+		return
+	}
+	for rows.Next() {
+		rows.Scan(&idUsuario, &tier)
+		query = fmt.Sprintf("CALL sp_insert_detalle_usuario_bl(%s,%s,%s)",
+			strconv.Itoa(idTemporada), tier, strconv.Itoa(idUsuario))
+		database.Execute(query)
+	}
+	defer rows.Close()
+}
+
+func JornadaDetalle (c *fiber.Ctx) error  {
+	t := time.Now()
+	day := t.Day() // type time.Month
+	month := t.Month() // type time.Month
+	year := t.Year() // type time.Month
+	name := fmt.Sprintf("%s-Q%s",strconv.Itoa(int(year)),strconv.Itoa(int(month)))
+
+	var idTemporada string
+	var participantes string
+	var fecha_fin string
+	var fecha_inicio string
+	var jornada string
+	var idJornada string
+	var semanaJornada string
+
+	query := fmt.Sprintf("SELECT COUNT(DETALLE_USUARIO.id_detalle_usuario), TEMPORADA.idTemporada, TEMPORADA.fechainicio, TEMPORADA.fechafin " +
+		"FROM DETALLE_USUARIO INNER JOIN TEMPORADA ON DETALLE_USUARIO.idTemporada = TEMPORADA.idTemporada " +
+		"WHERE TEMPORADA.nombre = '%s' GROUP BY TEMPORADA.idTemporada, TEMPORADA.fechainicio, TEMPORADA.fechafin", name)
+
+	rows,err := database.ExecuteQuery(query)
+
+	if err != nil {
+		return nil
+	}
+
+	for rows.Next() {
+		rows.Scan(&participantes, &idTemporada, &fecha_inicio, &fecha_fin)
+	}
+
+	//Verificando jornada actual si no se crea
+	if day < 8 {
+		jornada = "J1"
+		semanaJornada = "1"
+	} else if day < 15 {
+		jornada = "J2"
+		semanaJornada = "2"
+	} else if day < 22 {
+		jornada = "J3"
+		semanaJornada = "3"
+	} else {
+		jornada = "J4"
+		semanaJornada = "4"
+	}
+
+	query = fmt.Sprintf("CALL sp_insert_jornada_bl('%s','%s',%s,%s)",
+		jornada, fecha_inicio[0:10], semanaJornada, idTemporada)
+	database.Execute(query)
+
+	query = fmt.Sprintf("SELECT idJornada FROM JORNADA WHERE name = '%s' AND  idTemporada =%s", jornada, idTemporada)
+	rows,err = database.ExecuteQuery(query)
+
+	if err != nil {
+		return nil
+	}
+
+	for rows.Next() {
+		rows.Scan(&idJornada)
+	}
+
+	return c.JSON(fiber.Map{
+		"temporada": name,
+		"participantes": participantes,
+		"fecha": fecha_fin,
+		"jornada": jornada,
+		"idJornada": idJornada,
+	})
+}
+
+func HomeDetalle(c *fiber.Ctx) error  {
+	t := time.Now()
+	month := t.Month() // type time.Month
+	year := t.Year() // type time.Month
+	name := fmt.Sprintf("%s-Q%s",strconv.Itoa(int(year)),strconv.Itoa(int(month)))
+
+	query := fmt.Sprintf("SELECT COUNT(idMembresia), idMembresia " +
+		"FROM DETALLE_USUARIO INNER JOIN TEMPORADA ON DETALLE_USUARIO.idTemporada = TEMPORADA.idTemporada " +
+		"WHERE TEMPORADA.nombre = '%s' GROUP BY idMembresia", name)
+	rows,err := database.ExecuteQuery(query)
+	if err != nil {
+		return nil
+	}
+
+	var total = 0 // se reinicia por cada temporada
+	var totalTier models.TotalTemporada
+	var reward models.RewardBulkLoad
+
+	var count_gold = 0 	//cantidad de participates con tier gold
+	var count_silver = 0 //cantidad de participates con tier silver
+	var count_bronze = 0 //cantidad de participates con tier bronze
+
+	for rows.Next() {
+		rows.Scan(&totalTier.Cantidad, &reward.IdMembresia)
+		if reward.IdMembresia == 3 { //GOLD
+			total += totalTier.Cantidad * gold
+			count_gold = totalTier.Cantidad
+		} else if reward.IdMembresia == 2 { //SILVER
+			total += totalTier.Cantidad * silver
+			count_silver = totalTier.Cantidad
+		} else { //BRONZE
+			total += totalTier.Cantidad * bronze
+			count_bronze = totalTier.Cantidad
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"capital": total,
+		"gold": count_gold,
+		"silver": count_silver,
+		"bronze": count_bronze,
+	})
 }

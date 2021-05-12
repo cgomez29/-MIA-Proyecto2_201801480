@@ -1,38 +1,63 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useEffect, useState} from 'react';
 import Paper from '@material-ui/core/Paper';
-import {Grid} from "@material-ui/core";
-
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        '& > *': {
-            margin: theme.spacing(1),
-        },
-    },
-}));
+import Typography from "@material-ui/core/Typography";
+import EmojiEventsIcon from '@material-ui/icons/EmojiEvents';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import url from "../../config";
+import axios from "axios";
 
 const Home = () => {
-    const classes = useStyles();
+    const [data, setData] = useState({
+        capital: 0,
+        gold: 0,
+        silver: 0,
+        bronze: 0,
+    })
+    // styles
+    const paperStyle = {padding: 25, maxWidth: 350, margin: "20px auto"}
+
+    const instance = axios.create({
+        withCredentials: true,
+    })
+
+    useEffect(()=> {
+        (
+            async () => {
+                await instance.get(`${url}/home/detalle`)
+                    .then(res => {
+                        setData(res.data)
+                    })
+            }
+        )();
+    },[])
 
     return (
-        <Grid align="center" container>
-            <div className={classes.root}>
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={3} >
-                        hello
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper elevation={3} >
-                        hello
-                    </Paper>
-                </Grid>
-            </div>
-        </Grid>
-
+        <>
+            <Paper elevation={10} style={paperStyle}>
+                <Typography variant="body2" gutterBottom>
+                    CAPITAL
+                </Typography>
+                <AttachMoneyIcon/> Q.{data.capital}
+            </Paper>
+            <Paper elevation={10} style={paperStyle}>
+                <Typography variant="body2" gutterBottom>
+                    GOLD
+                </Typography>
+                <EmojiEventsIcon/> {data.gold}
+            </Paper>
+            <Paper elevation={10} style={paperStyle}>
+                <Typography variant="body2" gutterBottom>
+                    SILVER
+                </Typography>
+                <EmojiEventsIcon/><EmojiEventsIcon/> {data.silver}
+            </Paper>
+            <Paper elevation={10} style={paperStyle}>
+                <Typography variant="body2" gutterBottom>
+                    BRONZE
+                </Typography>
+                <EmojiEventsIcon/><EmojiEventsIcon/><EmojiEventsIcon/> {data.bronze}
+            </Paper>
+        </>
     );
 };
 

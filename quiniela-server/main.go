@@ -21,7 +21,7 @@ func main() {
 
 	//Crea automaticamente la temporada si no existe
 	controller.TemporadaActual()
-
+	controller.Rewards()
 	app.Listen(":8000")
 }
 

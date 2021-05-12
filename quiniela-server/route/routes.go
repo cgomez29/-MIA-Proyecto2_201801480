@@ -18,6 +18,10 @@ func Setup(app *fiber.App) {
 	app.Put("/api/user", controller.PutUser)
 	app.Put("/api/user/membresia", controller.PutUserMembresia)
 
+	//ADMIN
+	app.Get("/api/jornada/detalle", controller.JornadaDetalle)
+	app.Get("/api/home/detalle", controller.HomeDetalle)
+
 	// DEPORTES
 	app.Get("/api/deporte", controller.GetDeportes)
 	app.Get("/api/deporte/:id", controller.GetDeporte)

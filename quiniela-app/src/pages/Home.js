@@ -5,7 +5,7 @@ const Home = () =>{
 
     return (
         <React.Fragment >
-           Loggend in
+           <h1>WELCOME</h1>
         </React.Fragment>
     );
 };

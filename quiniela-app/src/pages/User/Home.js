@@ -3,7 +3,7 @@ import React from 'react';
 const Home = () => {
     return (
         <React.Fragment>
-            Home user
+            <h1>Home user</h1>
         </React.Fragment>
     );
 };

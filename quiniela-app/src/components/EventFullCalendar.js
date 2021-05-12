@@ -40,13 +40,12 @@ const EventFullCalendar = () => {
     const btnStyle = { margin:'8px 0', }
     const [open, setOpen] = useState(false)
     const [eventos, setEventos] = useState([])
-    const [noEditable, setNoEditable] = useState(true)
     const [data, setData] = useState({
         id: 0,
         title:'',
     })
     const [prediccion, setPrediccion] = useState({
-        idPrediccion: 0,
+        idPrediccion: -1,
         local: 0,
         visitante: 0,
     })
@@ -73,11 +72,7 @@ const EventFullCalendar = () => {
         await instance.get(`${url}/prediccion/${data.id}`)
             .then(res =>{
                 setPrediccion(res.data)
-                if(prediccion.idPrediccion === 0) {
-                    setNoEditable(true)
-                } else {
-                    setNoEditable(false)
-                }
+
             }).catch(err =>{
 
             })
@@ -113,7 +108,6 @@ const EventFullCalendar = () => {
         console.log(prediction)
         instance.post(`${url}/prediccion`,prediction)
             .then(res => {
-                console.log(res)
                 handleClose()
             }).catch(err=>{
                 console.log(err)
@@ -166,7 +160,6 @@ const EventFullCalendar = () => {
                                            value={prediccion.local}
                                            onChange={handleInputChange}
                                            fullWidth
-                                           disabled={noEditable}
                                 />
                                 <TextField type="number"
                                            name="visitante"
@@ -175,7 +168,6 @@ const EventFullCalendar = () => {
                                            value={prediccion.visitante}
                                            onChange={handleInputChange}
                                            fullWidth
-                                           disabled={noEditable}
                                 />
                                 <Button onClick={onSubmitPrediccion} color='primary' variant='contained' fullWidth style={btnStyle}>
                                     Guardar prediccion
